@@ -19,6 +19,20 @@ export default function Publish() {
 
   const [isYoutubeConnected, setIsYoutubeConnected] = useState(false);
   const [showConnectModal, setShowConnectModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleForm, setScheduleForm] = useState<{
+    title: string;
+    platform: Post['platform'];
+    date: string;
+    time: string;
+    type: Post['type'];
+  }>({
+    title: '',
+    platform: 'youtube',
+    date: new Date().toISOString().split('T')[0],
+    time: '12:00',
+    type: 'video',
+  });
   const [isConnecting, setIsConnecting] = useState(false);
   const [channelInfo, setChannelInfo] = useState<any>(null);
 
@@ -138,26 +152,36 @@ export default function Publish() {
     ));
   };
 
-  const handleSchedulePost = async () => {
-    const title = prompt('Enter post title:');
-    if (!title) return;
-    
-    // In a real app, we would ask for platform. Defaulting to youtube for now.
+  const handleSchedulePost = (day?: number) => {
+    const dateStr = day
+      ? `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+      : new Date().toISOString().split('T')[0];
+    setScheduleForm(f => ({ ...f, date: dateStr }));
+    setShowScheduleModal(true);
+  };
+
+  const handleSaveSchedule = async () => {
+    if (!scheduleForm.title.trim()) {
+      showToast('Please enter a post title', 'error');
+      return;
+    }
     const newPost: Omit<Post, 'id'> = {
-      platform: 'youtube',
-      title,
-      date: `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
-      time: '12:00',
+      platform: scheduleForm.platform,
+      title: scheduleForm.title,
+      date: scheduleForm.date,
+      time: scheduleForm.time,
       status: 'scheduled',
-      type: 'video'
+      type: scheduleForm.type,
     };
-    
     try {
       await publishService.createPost(newPost);
-      await loadPosts(); // Reload
-      alert('Post scheduled successfully!');
+      await loadPosts();
+      setShowScheduleModal(false);
+      setScheduleForm({ title: '', platform: 'youtube', date: new Date().toISOString().split('T')[0], time: '12:00', type: 'video' });
+      showToast('Post scheduled successfully!', 'success');
     } catch (error) {
-      console.error("Failed to schedule post", error);
+      console.error('Failed to schedule post', error);
+      showToast('Failed to schedule post', 'error');
     }
   };
 
@@ -212,6 +236,89 @@ export default function Publish() {
              </button>
           </div>
         </div>
+
+        {/* Schedule Post Modal */}
+        {showScheduleModal && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full border border-gray-200 dark:border-gray-700 shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Schedule Post</h3>
+                <button onClick={() => setShowScheduleModal(false)} className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Post Title</label>
+                  <input
+                    type="text"
+                    value={scheduleForm.title}
+                    onChange={e => setScheduleForm(f => ({ ...f, title: e.target.value }))}
+                    placeholder="Enter post title..."
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platform</label>
+                  <select
+                    value={scheduleForm.platform}
+                    onChange={e => setScheduleForm(f => ({ ...f, platform: e.target.value as Post['platform'] }))}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="youtube">YouTube</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="x">X (Twitter)</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="linkedin">LinkedIn</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
+                    <input
+                      type="date"
+                      value={scheduleForm.date}
+                      onChange={e => setScheduleForm(f => ({ ...f, date: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
+                    <input
+                      type="time"
+                      value={scheduleForm.time}
+                      onChange={e => setScheduleForm(f => ({ ...f, time: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Content Type</label>
+                  <select
+                    value={scheduleForm.type}
+                    onChange={e => setScheduleForm(f => ({ ...f, type: e.target.value as Post['type'] }))}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="video">Video</option>
+                    <option value="short">Short</option>
+                    <option value="post">Post</option>
+                    <option value="thread">Thread</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button onClick={() => setShowScheduleModal(false)} className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition font-medium">
+                  Cancel
+                </button>
+                <button onClick={handleSaveSchedule} className="flex-1 px-4 py-2 gradient-bg text-white rounded-lg hover:opacity-90 transition font-medium">
+                  Schedule
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Connect Modal */}
         {showConnectModal && (
@@ -329,7 +436,7 @@ export default function Publish() {
                           <div 
                             key={i} 
                             className={`min-h-[140px] bg-white dark:bg-gray-800 p-2 relative group transition hover:bg-gray-50 dark:hover:bg-gray-700/50 ${!day ? 'bg-gray-50 dark:bg-gray-800/50' : ''}`}
-                            onClick={() => day && handleSchedulePost()}
+                            onClick={() => day && handleSchedulePost(day as number)}
                           >
                             {day && (
                               <>

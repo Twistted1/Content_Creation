@@ -9,9 +9,33 @@ import { TeamOnline } from '@/components/dashboard/TeamOnline';
 import { QuickStart } from '@/components/dashboard/QuickStart';
 import { FileText, Eye, Users, DollarSign, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { scriptService } from '@/services/scriptService';
+import { publishService } from '@/services/publishService';
 
 export default function Home() {
   const navigate = useNavigate();
+  const [liveStats, setLiveStats] = useState({ scripts: '...', published: '...', scheduled: '...' });
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const [scripts, posts] = await Promise.all([
+          scriptService.getScripts(),
+          publishService.getPosts()
+        ]);
+        setLiveStats({
+          scripts: String(scripts.length),
+          published: String(posts.filter((p: any) => p.status === 'published').length),
+          scheduled: String(posts.filter((p: any) => p.status === 'scheduled').length),
+        });
+      } catch (e) {
+        console.error('Failed to load dashboard stats', e);
+        setLiveStats({ scripts: '0', published: '0', scheduled: '0' });
+      }
+    };
+    loadStats();
+  }, []);
 
   return (
     <div className="min-h-screen pb-8">
@@ -37,33 +61,33 @@ export default function Home() {
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatsCard 
-            label="Videos Published" 
-            value="24" 
-            change="12%" 
+            label="Scripts Saved" 
+            value={liveStats.scripts} 
+            change="" 
             icon={<FileText size={20} />} 
             iconBgClass="bg-blue-100 dark:bg-blue-500/10" 
             iconColorClass="text-blue-600 dark:text-blue-400" 
           />
           <StatsCard 
-            label="Total Views" 
-            value="2.4M" 
-            change="28%" 
+            label="Posts Published" 
+            value={liveStats.published} 
+            change="" 
             icon={<Eye size={20} />} 
             iconBgClass="bg-purple-100 dark:bg-purple-500/10" 
             iconColorClass="text-purple-600 dark:text-purple-400" 
           />
           <StatsCard 
-            label="Subscribers" 
-            value="45.2K" 
-            change="8%" 
+            label="Posts Scheduled" 
+            value={liveStats.scheduled} 
+            change="" 
             icon={<Users size={20} />} 
             iconBgClass="bg-green-100 dark:bg-green-500/10" 
             iconColorClass="text-green-600 dark:text-green-400" 
           />
           <StatsCard 
             label="Revenue" 
-            value="$1,284" 
-            change="15%" 
+            value="$0" 
+            change="" 
             icon={<DollarSign size={20} />} 
             iconBgClass="bg-orange-100 dark:bg-orange-500/10" 
             iconColorClass="text-orange-600 dark:text-orange-400" 

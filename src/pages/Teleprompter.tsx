@@ -55,6 +55,8 @@ export default function Teleprompter() {
   const [recognizedText, setRecognizedText] = useState('');
   const [isListening, setIsListening] = useState(false);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const isVoiceModeRef = useRef(false);
+  const lastFinalRef = useRef('');
   
   // Auto-scroll logic
   const textRef = useRef<HTMLDivElement>(null);
@@ -77,11 +79,22 @@ export default function Teleprompter() {
               recognitionRef.current.lang = 'en-US';
 
               recognitionRef.current.onresult = (event: any) => {
-                const transcript = Array.from(event.results)
-                  .map((result: any) => result[0].transcript)
-                  .join(' ');
-                
-                setRecognizedText(transcript.toLowerCase());
+                let finalText = '';
+                let interimText = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                  if (event.results[i].isFinal) {
+                    finalText += event.results[i][0].transcript + ' ';
+                  } else {
+                    interimText += event.results[i][0].transcript;
+                  }
+                }
+                if (finalText) {
+                  const combined = (lastFinalRef.current + ' ' + finalText).trim();
+                  const words = combined.split(/\s+/);
+                  lastFinalRef.current = words.slice(-20).join(' ');
+                }
+                const rolling = (lastFinalRef.current + ' ' + interimText).trim();
+                setRecognizedText(rolling.toLowerCase());
               };
 
               recognitionRef.current.onerror = (event: any) => {
@@ -96,8 +109,12 @@ export default function Teleprompter() {
               
               recognitionRef.current.onend = () => {
                  setIsListening(false);
-                 // Auto-restart if mode is still active (keep alive)
-                 // NOTE: We check a ref or external state here ideally, but for now simple check
+                 if (isVoiceModeRef.current) {
+                   try {
+                     recognitionRef.current.start();
+                     setIsListening(true);
+                   } catch(e) { /* already started */ }
+                 }
               };
           } catch (e) {
               console.error("Speech Init Failed", e);
@@ -108,22 +125,23 @@ export default function Teleprompter() {
 
   // Voice Mode Toggle
   useEffect(() => {
+     isVoiceModeRef.current = isVoiceMode;
      if (!recognitionRef.current) return;
-
      if (isVoiceMode) {
         try {
+           lastFinalRef.current = '';
+           setRecognizedText('');
            recognitionRef.current.start();
            setIsListening(true);
-           showToast('Voice Tracking Enabled (Beta)', 'info');
-        } catch(e) { 
-           // Usually means already started
+           showToast('Voice Tracking Enabled', 'info');
+        } catch(e) {
            console.log("Speech start error:", e);
         }
      } else {
-        try {
-           recognitionRef.current.stop();
-        } catch(e) {}
+        try { recognitionRef.current.stop(); } catch(e) {}
         setIsListening(false);
+        setRecognizedText('');
+        lastFinalRef.current = '';
      }
   }, [isVoiceMode]);
 
@@ -152,17 +170,17 @@ export default function Teleprompter() {
 
   // Helper to split text into spans for voice tracking
   const renderPrompterText = () => {
+     const recentWords = new Set(
+       recognizedText.split(/\s+/).map(w => w.replace(/[^a-z0-9]/g, '')).filter(w => w.length > 2)
+     );
      return prompterText.split(/(\s+)/).map((word, i) => {
-        const cleanWord = word.trim().toLowerCase();
-        // Check if this word is in the recent recognized text
-        // Very basic matching for demo
-        const isSpoken = isVoiceMode && recognizedText.includes(cleanWord) && cleanWord.length > 3;
-        
+        const cleanWord = word.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        const isSpoken = isVoiceMode && cleanWord.length > 2 && recentWords.has(cleanWord);
         return (
-          <span 
-             key={i} 
+          <span
+             key={i}
              ref={el => wordRefs.current[i] = el}
-             className={`transition-colors duration-300 ${isSpoken ? 'text-yellow-400' : 'text-white'}`}
+             className={`transition-colors duration-200 ${isSpoken ? 'text-yellow-300 font-semibold' : 'text-white'}`}
           >
              {word}
           </span>

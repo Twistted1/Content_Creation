@@ -3,6 +3,7 @@ import { TopNav } from '@/components/dashboard/TopNav';
 import { automationService, Workflow, WorkflowStep } from '@/services/automationService';
 import { aiService } from '@/services/aiService';
 import { publishService } from '@/services/publishService';
+import { showToast } from '@/utils/toast';
 
 export default function Automation() {
   const [stats, setStats] = useState({
@@ -96,11 +97,11 @@ export default function Automation() {
       await loadWorkflows(); // Reload to get the new ID
       setBuilderSteps([]); 
       setNewWorkflowName('New Workflow');
-      alert('Workflow saved successfully!');
+      showToast('Workflow saved successfully!', 'success');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error("Failed to save workflow", error);
-      alert('Failed to save workflow');
+      showToast('Failed to save workflow', 'error');
     }
   };
 
@@ -190,11 +191,11 @@ export default function Automation() {
       await automationService.updateWorkflow(id, { lastRun: 'Just now' });
       await loadWorkflows();
 
-      alert(`Workflow "${workflow.name}" completed successfully!`);
+      showToast(`Workflow "${workflow.name}" completed!`, 'success');
 
     } catch (error) {
       console.error("Workflow failed", error);
-      alert(`Workflow failed: ${error}`);
+      showToast(`Workflow failed: ${(error as Error).message || 'Unknown error'}`, 'error');
     } finally {
       setRunningWorkflowId(null);
       setCurrentStepIndex(-1);

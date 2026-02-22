@@ -636,10 +636,11 @@ const SegmentList = styled.div`
 
 const StudioContainer = styled.div`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  height: auto;
+  height: calc(100vh - 160px);
   min-height: 600px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const Timer = styled.div`
@@ -660,61 +661,51 @@ const Timer = styled.div`
 `;
 
 const MainLayout = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 260px 1fr 320px 300px;
   flex: 1;
   background: transparent;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  align-items: stretch;
+  min-height: 0;
+  overflow: hidden;
+
+  @media (max-width: 1400px) {
+    grid-template-columns: 240px 1fr 300px 280px;
+  }
 `;
 
 const SidebarLeft = styled.div`
-  width: 280px;
-  background: #f9fafb; /* gray-50 */
+  background: #f9fafb;
   padding: 16px;
-  border-right: 1px solid #e5e7eb; /* gray-200 */
-  
+  border-right: 1px solid #e5e7eb;
+  overflow-y: auto;
+
   .dark & {
-    background: #111827; /* gray-900 */
-    border-right-color: #374151; /* gray-700 */
-  }
-  
-  @media (max-width: 1024px) {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e5e7eb;
-    .dark & {
-      border-bottom-color: #374151;
-    }
+    background: #111827;
+    border-right-color: #374151;
   }
 `;
 
 const CenterPanel = styled.div`
-  flex: 1;
   display: flex;
   flex-direction: column;
   padding: 16px;
   gap: 16px;
-  min-width: 320px;
+  overflow-y: auto;
+  min-width: 0;
 `;
 
 const SidebarRight = styled.div`
-  width: 320px;
-  background: #f9fafb; /* gray-50 */
+  background: #f9fafb;
   padding: 16px;
-  border-left: 1px solid #e5e7eb; /* gray-200 */
+  border-left: 1px solid #e5e7eb;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 
   .dark & {
-    background: #111827; /* gray-900 */
-    border-left-color: #374151; /* gray-700 */
-  }
-
-  @media (max-width: 1280px) {
-    width: 100%;
-    border-left: none;
-    border-top: 1px solid #e5e7eb;
-    .dark & {
-      border-top-color: #374151;
-    }
+    background: #111827;
+    border-left-color: #374151;
   }
 `;
 
@@ -948,9 +939,9 @@ const VideoControlButton = styled.button<VideoControlButtonProps>`
 
 const MixerGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(7, 1fr) 80px;
-  gap: 8px;
-  height: 200px;
+  grid-template-columns: repeat(6, 1fr) 70px 40px;
+  gap: 6px;
+  height: auto;
 `;
 
 const Channel = styled.div`
@@ -1035,37 +1026,34 @@ const MeterFill = styled.div<MeterBarProps>`
 
 const FaderWrapper = styled.div`
   width: 100%;
-  height: 120px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 6px 0;
 `;
 
 const Fader = styled.input`
-  width: 120px;
-  height: 100%;
-  transform: rotate(-90deg);
+  width: 100%;
+  height: 4px;
   background: #e5e7eb;
   border-radius: 3px;
   outline: none;
   appearance: none;
-  position: absolute;
-  top: 60px;
-  left: -50px;
-  
+  cursor: pointer;
+
   .dark & {
     background: #4b5563;
   }
-  
+
   &::-webkit-slider-thumb {
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: #9333ea;
     cursor: pointer;
-    border: 3px solid #fff;
+    border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 `;
