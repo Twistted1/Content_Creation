@@ -7,12 +7,13 @@ import { showToast } from '@/utils/toast';
 
 export default function Automation() {
   const [stats, setStats] = useState({
-    completed: 47,
-    timeSavedHours: 24,
-    timeSavedMinutes: 35,
-    creditsUsed: 1234,
+    completed: 0,
+    timeSavedHours: 0,
+    timeSavedMinutes: 0,
+    creditsUsed: 0,
     creditsTotal: 5000
   });
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +29,15 @@ export default function Automation() {
     try {
       const data = await automationService.getWorkflows();
       setWorkflows(data);
+      // Derive stats from real data
+      const completed = data.filter(w => w.lastRun && w.lastRun !== 'Never').length;
+      setStats(prev => ({
+        ...prev,
+        completed,
+        timeSavedHours: Math.floor(completed * 0.5),
+        timeSavedMinutes: (completed * 30) % 60,
+        creditsUsed: completed * 50
+      }));
     } catch (error) {
       console.error("Failed to load workflows", error);
     } finally {
@@ -65,13 +75,20 @@ export default function Automation() {
   };
 
   const deleteWorkflow = async (id: string) => {
-    if (confirm('Are you sure you want to delete this workflow?')) {
+    if (confirmDeleteId === id) {
       try {
         await automationService.deleteWorkflow(id);
         setWorkflows(prev => prev.filter(w => w.id !== id));
+        showToast('Workflow deleted', 'success');
       } catch (error) {
         console.error("Failed to delete workflow", error);
+        showToast('Failed to delete workflow', 'error');
+      } finally {
+        setConfirmDeleteId(null);
       }
+    } else {
+      setConfirmDeleteId(id);
+      setTimeout(() => setConfirmDeleteId(null), 3000);
     }
   };
 
@@ -252,9 +269,10 @@ export default function Automation() {
                         </button>
                         <button 
                           onClick={() => workflow.id && deleteWorkflow(workflow.id)}
-                          className="text-gray-400 hover:text-red-400 transition"
+                          className={`text-xs px-2 py-1 rounded transition ${confirmDeleteId === workflow.id ? 'bg-red-500 text-white' : 'text-gray-400 hover:text-red-400'}`}
+                          title={confirmDeleteId === workflow.id ? 'Click again to confirm' : 'Delete workflow'}
                         >
-                          <i className="fas fa-trash"></i>
+                          {confirmDeleteId === workflow.id ? 'Confirm?' : <i className="fas fa-trash"></i>}
                         </button>
                         <div className="flex items-center gap-2 ml-2">
                           <span className={`text-xs ${workflow.isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>

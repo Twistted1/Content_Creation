@@ -79,7 +79,7 @@ export default function Analytics() {
 
   useEffect(() => {
     loadAnalytics();
-  }, []);
+  }, [timeRange]);
 
   const loadAnalytics = async () => {
     try {

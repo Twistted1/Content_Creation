@@ -57,13 +57,13 @@ export default function Publish() {
     const handleConnectYoutube = () => {
     const keys = localStorage.getItem('api_keys');
     if (!keys) {
-      alert('Please configure YouTube API keys in Settings first.');
+      showToast('Please configure YouTube API keys in Settings first.', 'error');
       return;
     }
     
     const { youtubeClientId } = JSON.parse(keys);
     if (!youtubeClientId) {
-      alert('Missing YouTube Client ID in Settings.');
+      showToast('Missing YouTube Client ID in Settings.', 'error');
       return;
     }
 
@@ -78,9 +78,9 @@ export default function Publish() {
           sessionStorage.setItem('youtube_access_token', response.access_token);
           setIsYoutubeConnected(true);
           setShowConnectModal(false);
-          alert('Successfully connected to YouTube!');
+          showToast('Successfully connected to YouTube!', 'success');
         } else {
-          alert('Failed to connect to YouTube.');
+          showToast('Failed to connect to YouTube.', 'error');
         }
         setIsConnecting(false);
       },
@@ -89,7 +89,7 @@ export default function Publish() {
     if (client) {
       client.requestAccessToken();
     } else {
-      alert('Google Identity Services script not loaded. Please refresh the page.');
+      showToast('Google Identity Services not loaded. Please refresh the page.', 'error');
       setIsConnecting(false);
     }
   };

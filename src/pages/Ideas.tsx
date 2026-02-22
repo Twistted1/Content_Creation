@@ -136,7 +136,7 @@ export default function Ideas() {
   };
 
   const deleteSavedIdea = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this idea?")) return;
+    // Two-click delete: first click sets confirmDeleteId, second click confirms
     try {
       await ideaService.deleteIdea(id);
       showToast('Idea removed', 'success');

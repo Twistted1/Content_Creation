@@ -5,6 +5,7 @@ import { usePodcastSession } from './hooks/usePodcastSession';
 import { useRecording } from './hooks/useRecording';
 import { podcastService } from '@/services/podcastService';
 import { authService } from '@/services/authService';
+import { showToast } from '@/utils/toast';
 import {
   FaMicrophone, FaWaveSquare, FaBolt, FaCoffee, FaRedo, FaPhone,
   FaVideo, FaDesktop, FaSlidersH, FaCog, FaPlus,
@@ -79,10 +80,10 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({ onRecordingToggle, isLive
       setShowSaveModal(false);
       setRecordedBlob(null);
       setEpisodeTitle('');
-      alert("Episode published successfully!");
+      showToast("Episode published successfully!", "success");
     } catch (error) {
       console.error("Failed to save episode", error);
-      alert("Failed to save episode. Please try again.");
+      showToast("Failed to save episode. Please try again.", "error");
     } finally {
       setIsUploading(false);
     }
@@ -464,6 +465,9 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({ onRecordingToggle, isLive
             </JingleGrid>
           </Panel>
 
+        </SidebarRight>
+        {/* Right Sidebar — Column 4: Teleprompter + Show Notes */}
+        <SidebarRight>
           {/* Teleprompter */}
           <Panel>
             <PanelHeader>

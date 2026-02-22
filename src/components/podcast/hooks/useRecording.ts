@@ -1,3 +1,4 @@
+import { showToast } from '@/utils/toast';
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 interface UseRecordingOptions {
@@ -59,7 +60,7 @@ export const useRecording = (options: UseRecordingOptions = {}) => {
       }
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      alert("Could not access microphone. Please check permissions.");
+      showToast("Could not access microphone. Please check permissions.", "error");
     }
   }, [isRecording, options, startTime]);
 

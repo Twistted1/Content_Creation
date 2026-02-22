@@ -104,13 +104,19 @@ export default function Script() {
     }
   };
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const deleteScript = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent loading the script when clicking delete
-    if (!window.confirm('Are you sure you want to delete this script?')) return;
-    
+    e.stopPropagation();
+    if (deleteConfirmId !== id) {
+      setDeleteConfirmId(id);
+      setTimeout(() => setDeleteConfirmId(null), 3000);
+      return;
+    }
+    setDeleteConfirmId(null);
     try {
       await scriptService.deleteScript(id);
-      showToast('Script deleted successfully', 'success');
+      showToast('Script deleted', 'success');
       loadScripts();
     } catch (error) {
       showToast('Failed to delete script', 'error');
@@ -283,16 +289,16 @@ export default function Script() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
               <h3 className="font-bold mb-4 text-gray-900 dark:text-white">📋 Script Outline</h3>
               <div className="space-y-2">
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(scriptContent + '\n[HOOK]\n')}>
+                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(prev => prev + '\n\n[HOOK]\nHave you ever wondered how to [TOPIC]? Well, today I\'m going to show you exactly how.\n')}>
                   <span className="text-purple-600 dark:text-purple-400 font-bold">Hook:</span> Start with a compelling question
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(scriptContent + '\n[INTRO]\n')}>
+                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(prev => prev + '\n\n[INTRO]\nHi everyone! Welcome back to the channel. Today we are diving deep into [TOPIC]. If you\'re new here, make sure to subscribe!\n')}>
                   <span className="text-blue-600 dark:text-blue-400 font-bold">Intro:</span> Brief self-introduction (15s)
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(scriptContent + '\n[BODY]\n')}>
+                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(prev => prev + '\n\n[MAIN CONTENT]\nFirst, let\'s talk about the basics...\n\nNext, we need to look at the advanced techniques...\n\nFinally, let\'s put it all together...\n')}>
                   <span className="text-green-600 dark:text-green-400 font-bold">Main:</span> Core content delivery
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(scriptContent + '\n[CTA]\n')}>
+                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-transparent text-gray-700 dark:text-gray-200" onClick={() => setScriptContent(prev => prev + '\n\n[CALL TO ACTION]\nIf you found this helpful, smash that like button and subscribe for more content like this. Drop a comment below and let me know what you think!\n')}>
                   <span className="text-orange-600 dark:text-orange-400 font-bold">CTA:</span> Call to action (10s)
                 </div>
               </div>
@@ -316,9 +322,14 @@ export default function Script() {
                         <span className="text-xs text-gray-500 dark:text-gray-500 whitespace-nowrap">{new Date(script.date).toLocaleDateString()}</span>
                         <button 
                           onClick={(e) => deleteScript(script.id!, e)}
-                          className="p-1 hover:text-red-500 dark:hover:text-red-400 transition opacity-0 group-hover:opacity-100 text-gray-400"
+                          className={`p-1 transition opacity-0 group-hover:opacity-100 text-xs font-bold rounded px-1.5 ${
+                            deleteConfirmId === script.id
+                              ? 'bg-red-500 text-white opacity-100'
+                              : 'hover:text-red-500 dark:hover:text-red-400 text-gray-400'
+                          }`}
+                          title={deleteConfirmId === script.id ? 'Click again to confirm' : 'Delete'}
                         >
-                          <i className="fas fa-trash"></i>
+                          {deleteConfirmId === script.id ? 'Confirm?' : <i className="fas fa-trash"></i>}
                         </button>
                       </div>
                     </div>

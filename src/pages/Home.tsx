@@ -12,10 +12,24 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { scriptService } from '@/services/scriptService';
 import { publishService } from '@/services/publishService';
+import { auth } from '@/lib/firebase';
 
 export default function Home() {
   const navigate = useNavigate();
   const [liveStats, setLiveStats] = useState({ scripts: '...', published: '...', scheduled: '...' });
+  const [userName, setUserName] = useState('there');
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      const name = user.displayName || user.email?.split('@')[0] || 'there';
+      setUserName(name);
+    }
+    const unsub = auth.onAuthStateChanged((u) => {
+      if (u) setUserName(u.displayName || u.email?.split('@')[0] || 'there');
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -46,7 +60,7 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold mb-1 flex items-center gap-2 text-gray-900 dark:text-white">
-              Welcome back, John! <span className="text-xl">👋</span>
+              Welcome back, {userName}! <span className="text-xl">👋</span>
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">Here's your content overview for today</p>
           </div>

@@ -68,6 +68,12 @@ export default function Production() {
   const originalVoiceText = data.originalVoiceText;
   const setOriginalVoiceText = (val: string) => updateState({ originalVoiceText: val });
 
+  const imageStyle = data.imageStyle ?? 'realistic';
+  const setImageStyle = (val: string) => updateState({ imageStyle: val });
+
+  const imageSize = data.imageSize ?? '1024x1024';
+  const setImageSize = (val: string) => updateState({ imageSize: val });
+
   // Local UI State
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -264,7 +270,8 @@ export default function Production() {
     if (!imagePrompt) return showToast('Please describe the image', 'error');
     setIsProcessing(true);
     try {
-      const url = await aiService.generateImage(imagePrompt);
+      const fullPrompt = `${imagePrompt}, ${imageStyle} style, ${imageSize} aspect ratio`;
+      const url = await aiService.generateImage(fullPrompt);
       setGeneratedImages([url, ...generatedImages]);
       showToast('Image generated successfully', 'success');
     } catch (error) {
@@ -490,10 +497,12 @@ export default function Production() {
                   )}
                 </div>
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
-                  <h3 className="font-bold mb-4 text-gray-900 dark:text-white">💰 Cost Estimate</h3>
+                  <h3 className="font-bold mb-4 text-gray-900 dark:text-white">💰 Estimated Cost</h3>
                   <div className="text-center">
-                    <p className="text-3xl font-bold gradient-bg bg-clip-text text-transparent">$0.023</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">per 1,000 characters</p>
+                    <p className="text-3xl font-bold gradient-bg bg-clip-text text-transparent">
+                      ${voiceText ? (voiceText.length * 0.000015).toFixed(4) : '0.0000'}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{voiceText.length} chars × $0.000015</p>
                   </div>
                 </div>
               </div>
@@ -525,20 +534,9 @@ export default function Production() {
                
                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                  <h3 className="font-bold mb-4 text-gray-900 dark:text-white">🗣️ My Cloned Voices</h3>
-                 <div className="space-y-3">
-                   <div className="p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl flex items-center gap-4 border border-purple-100 dark:border-purple-500/20">
-                     <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
-                       <i className="fas fa-user-astronaut text-purple-600 dark:text-purple-400"></i>
-                     </div>
-                     <div className="flex-1">
-                       <p className="font-medium text-gray-900 dark:text-white">Narrator Clone</p>
-                       <p className="text-xs text-gray-500 dark:text-gray-400">Trained on 25 min • Created Dec 1</p>
-                     </div>
-                     <button className="p-2 bg-purple-500/10 rounded-lg text-purple-600 dark:text-purple-400 hover:bg-purple-500/20">
-                       <i className="fas fa-play"></i>
-                     </button>
-                   </div>
-                 </div>
+                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-6">
+                   No cloned voices yet. Upload audio samples above to train your first voice model.
+                 </p>
                </div>
              </div>
           )}
@@ -556,17 +554,17 @@ export default function Production() {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
                     <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Style</label>
-                    <select className="w-full bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-sm border border-gray-200 dark:border-transparent text-gray-900 dark:text-white">
+                    <select value={imageStyle} onChange={(e) => setImageStyle(e.target.value)} className="w-full bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-sm border border-gray-200 dark:border-transparent text-gray-900 dark:text-white">
                       <option value="realistic">Realistic</option>
                       <option value="anime">Anime</option>
                       <option value="cartoon">Cartoon</option>
-                      <option value="oil">Oil Painting</option>
-                      <option value="3d">3D Render</option>
+                      <option value="oil painting">Oil Painting</option>
+                      <option value="3D render">3D Render</option>
                     </select>
                   </div>
                   <div>
                     <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Size</label>
-                    <select className="w-full bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-sm border border-gray-200 dark:border-transparent text-gray-900 dark:text-white">
+                    <select value={imageSize} onChange={(e) => setImageSize(e.target.value)} className="w-full bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-sm border border-gray-200 dark:border-transparent text-gray-900 dark:text-white">
                       <option value="1024x1024">1024×1024</option>
                       <option value="1280x720">1280×720</option>
                       <option value="720x1280">720×1280</option>

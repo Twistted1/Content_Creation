@@ -64,7 +64,7 @@ export default function Pricing() {
 
   const handlePlanClick = (plan: typeof PLANS[0]) => {
     if (!auth.currentUser) {
-        alert("Please login first to upgrade your plan.");
+        showToast("Please login first to upgrade your plan.", "error");
         // Optional: navigate('/login');
         return;
     }
