@@ -1,0 +1,728 @@
+import React, { useState, useEffect } from 'react';
+import { TopNav } from '@/components/dashboard/TopNav';
+import { podcastService, PodcastData } from '@/services/podcastService';
+import { scriptService } from '@/services/scriptService';
+
+// Toast helper
+const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const toast = document.createElement('div');
+  toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-500 translate-y-10 opacity-0 z-50 ${
+    type === 'success' ? 'bg-green-500/90 text-white' : 
+    type === 'error' ? 'bg-red-500/90 text-white' : 
+    'bg-blue-500/90 text-white'
+  }`;
+  toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-${
+    type === 'success' ? 'check-circle' : 
+    type === 'error' ? 'exclamation-circle' : 
+    'info-circle'
+  }"></i> ${message}</div>`;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+  setTimeout(() => {
+    toast.classList.add('translate-y-10', 'opacity-0');
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
+};
+
+export default function Podcast() {
+  const [activeTab, setActiveTab] = useState<'episodes' | 'studio'>('episodes');
+  const [podcasts, setPodcasts] = useState<PodcastData[]>([]);
+  const [scripts, setScripts] = useState<any[]>([]);
+  
+  // Studio State
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  // Audio Visualization & Processing State
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [gainNode, setGainNode] = useState<GainNode | null>(null);
+  const [filterNode, setFilterNode] = useState<BiquadFilterNode | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState('Studio');
+  const [inputGain, setInputGain] = useState(1); // 1 = 0dB
+
+  // Update filter dynamically when preset changes
+  useEffect(() => {
+    if (filterNode && audioContext) {
+        // Reset/Update filter params based on new preset
+        const now = audioContext.currentTime;
+        
+        switch (selectedPreset) {
+          case 'Radio':
+              filterNode.type = 'lowshelf';
+              filterNode.frequency.setValueAtTime(200, now);
+              filterNode.gain.setValueAtTime(6, now);
+              filterNode.Q.setValueAtTime(0, now);
+              break;
+          case 'Crisp':
+              filterNode.type = 'highshelf';
+              filterNode.frequency.setValueAtTime(3000, now);
+              filterNode.gain.setValueAtTime(4, now);
+              filterNode.Q.setValueAtTime(0, now);
+              break;
+          case 'Warm':
+              filterNode.type = 'peaking';
+              filterNode.frequency.setValueAtTime(500, now);
+              filterNode.Q.setValueAtTime(0.5, now);
+              filterNode.gain.setValueAtTime(3, now);
+              break;
+          case 'Phone':
+              filterNode.type = 'bandpass';
+              filterNode.frequency.setValueAtTime(1000, now);
+              filterNode.Q.setValueAtTime(1.5, now);
+              filterNode.gain.setValueAtTime(0, now);
+              break;
+          case 'Echo':
+              // Simple fake echo using delay would require graph reconstruction
+              // For now, just a distinct EQ curve
+              filterNode.type = 'peaking';
+              filterNode.frequency.setValueAtTime(2000, now);
+              filterNode.Q.setValueAtTime(1, now);
+              filterNode.gain.setValueAtTime(5, now);
+              break;
+          default: // Studio
+              filterNode.type = 'allpass';
+              filterNode.gain.setValueAtTime(0, now);
+        }
+    }
+  }, [selectedPreset, filterNode, audioContext]);
+  
+  const [visualData, setVisualData] = useState<Uint8Array>(new Uint8Array(0));
+  const PRESETS = [
+    { id: 'Studio', label: 'Studio', desc: 'Balanced & Clear', icon: 'microphone-alt' },
+    { id: 'Radio', label: 'Radio', desc: 'Deep & Bass Heavy', icon: 'broadcast-tower' },
+    { id: 'Crisp', label: 'Crisp', desc: 'High Clarity', icon: 'bolt' },
+    { id: 'Warm', label: 'Warm', desc: 'Soft & Rich', icon: 'coffee' },
+    { id: 'Echo', label: 'Echo', desc: 'Reverb Effect', icon: 'wave-square' },
+    { id: 'Phone', label: 'Phone', desc: 'Lo-Fi Filter', icon: 'mobile-alt' }
+  ];
+
+  // ... (inside component)
+
+  const applyPreset = (ctx: AudioContext, preset: string, gain: GainNode) => {
+      // Clear previous filters if complex logic needed (for now, simpler swap)
+      // This is a placeholder for real DSP logic
+      // Real implementations would use a ConvolverNode for Reverb or DynamicsCompressorNode
+      
+      const filter = ctx.createBiquadFilter();
+      
+      switch (preset) {
+          case 'Radio':
+              filter.type = 'lowshelf';
+              filter.frequency.value = 200;
+              filter.gain.value = 6; // Boost bass
+              break;
+          case 'Crisp':
+              filter.type = 'highshelf';
+              filter.frequency.value = 3000;
+              filter.gain.value = 4; // Boost treble
+              break;
+          case 'Warm':
+              filter.type = 'peaking';
+              filter.frequency.value = 500;
+              filter.Q.value = 0.5;
+              filter.gain.value = 3; // Boost mids
+              break;
+          case 'Phone':
+              filter.type = 'bandpass';
+              filter.frequency.value = 1000;
+              filter.Q.value = 1.5;
+              break;
+          default:
+              filter.type = 'allpass';
+      }
+      return filter;
+  };
+  
+  // Teleprompter State
+  const [teleprompterText, setTeleprompterText] = useState('');
+  const [fontSize, setFontSize] = useState(18);
+  const [isPrompterPlaying, setIsPrompterPlaying] = useState(false);
+  const [prompterSpeed, setPrompterSpeed] = useState(1);
+  const prompterRef = React.useRef<HTMLTextAreaElement>(null);
+
+  // New Episode Form
+  const [newEpisode, setNewEpisode] = useState<{title: string, topic: string}>({ title: '', topic: '' });
+
+  const loadScripts = async () => {
+    try {
+      const data = await scriptService.getScripts();
+      setScripts(data);
+    } catch (error) {
+      console.error("Failed to load scripts", error);
+    }
+  };
+
+  const loadPodcasts = async () => {
+    try {
+      const data = await podcastService.getPodcasts();
+      setPodcasts(data);
+    } catch (error) {
+      console.error("Failed to load podcasts", error);
+    }
+  };
+
+  useEffect(() => {
+    loadPodcasts();
+    loadScripts();
+    return () => {
+      if (audioContext) audioContext.close();
+    };
+  }, []);
+
+  // Teleprompter Auto-Scroll
+  useEffect(() => {
+    let scrollInterval: any;
+    if (isPrompterPlaying && prompterRef.current) {
+      scrollInterval = setInterval(() => {
+        if (prompterRef.current) {
+          prompterRef.current.scrollTop += prompterSpeed;
+        }
+      }, 50); // 20fps update
+    }
+    return () => clearInterval(scrollInterval);
+  }, [isPrompterPlaying, prompterSpeed]);
+
+  // Timer Logic
+  useEffect(() => {
+    let interval: any;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isRecording]);
+
+  // Audio Visualizer Loop
+  useEffect(() => {
+    let animationFrame: number;
+    
+    const draw = () => {
+      if (analyser && isRecording) {
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(dataArray);
+        setVisualData(dataArray);
+        animationFrame = requestAnimationFrame(draw);
+      } else if (!isRecording) {
+         setVisualData(new Uint8Array(0)); // Reset visualizer
+      }
+    };
+    
+    if (isRecording) {
+       draw();
+    } else {
+       cancelAnimationFrame(animationFrame!);
+    }
+    
+    return () => cancelAnimationFrame(animationFrame!);
+  }, [analyser, isRecording]);
+
+  const handleShare = (podcast: PodcastData) => {
+    const shareData = {
+      title: podcast.title,
+      text: `Check out my new podcast episode: ${podcast.title} about ${podcast.topic}!`,
+      url: podcast.audioUrl || window.location.href
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData)
+        .then(() => showToast('Shared successfully!', 'success'))
+        .catch((err) => console.log('Error sharing:', err));
+    } else {
+      // Fallback
+      navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+      showToast('Link copied to clipboard!', 'success');
+    }
+  };
+
+  const handleCreateEpisode = async () => {
+    if (!newEpisode.title || !newEpisode.topic) {
+      showToast('Please fill in all fields', 'error');
+      return;
+    }
+
+    try {
+      await podcastService.createPodcast({
+        title: newEpisode.title,
+        topic: newEpisode.topic,
+        hosts: ['You'],
+        guests: [],
+        duration: '00:00',
+        status: 'planning'
+      });
+      showToast('Episode created successfully', 'success');
+      setNewEpisode({ title: '', topic: '' });
+      loadPodcasts();
+    } catch (error) {
+      showToast('Failed to create episode', 'error');
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Setup Web Audio API
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const source = ctx.createMediaStreamSource(stream);
+      const analyserNode = ctx.createAnalyser();
+      analyserNode.fftSize = 64; // Low resolution for bar visualizer
+      
+      const gain = ctx.createGain();
+      gain.gain.value = inputGain;
+      
+      // Simple Preset Logic (Filter)
+      const filter = ctx.createBiquadFilter(); // Just create it, logic handled in useEffect
+      setFilterNode(filter); // Store reference for updates
+
+      // Connect Graph: Source -> Gain -> Filter -> Analyser -> Dest
+      const dest = ctx.createMediaStreamDestination();
+      source.connect(gain);
+      gain.connect(filter);
+      filter.connect(analyserNode);
+      filter.connect(dest);
+      
+      setAudioContext(ctx);
+      setAnalyser(analyserNode);
+      setGainNode(gain);
+
+      // Record the PROCESSED destination stream, not the raw mic
+      const recorder = new MediaRecorder(dest.stream);
+      const chunks: Blob[] = [];
+      
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/mp3' });
+        setRecordedBlob(blob);
+        setAudioUrl(URL.createObjectURL(blob));
+        stream.getTracks().forEach(track => track.stop()); // Stop mic
+        ctx.close(); // Close audio context
+      };
+      
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setRecordingTime(0);
+      
+      // Auto-start teleprompter if it has text
+      if (teleprompterText.length > 0) setIsPrompterPlaying(true);
+
+    } catch (err) {
+      console.error(err);
+      showToast('Microphone access denied', 'error');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setIsPrompterPlaying(false); // Stop prompter
+    }
+  };
+
+  const saveRecording = async () => {
+    if (!recordedBlob) return;
+    
+    // Optimistic Update
+    const title = `Recording ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+    const tempId = `temp-${Date.now()}`;
+    const newPodcast: PodcastData = {
+        id: tempId,
+        title: title,
+        topic: 'Studio Recording',
+        hosts: ['You'],
+        guests: [],
+        duration: formatTime(recordingTime),
+        status: 'published',
+        audioUrl: '' 
+    };
+    
+    // Add to list immediately (optimistic)
+    setPodcasts(prev => [newPodcast, ...prev]);
+    showToast('Saving in background...', 'info');
+    
+    // Background Upload
+    podcastService.uploadEpisode(recordedBlob, title)
+      .then(async (audioUrl) => {
+          await podcastService.createPodcast({
+            title: title,
+            topic: 'Studio Recording',
+            hosts: ['You'],
+            guests: [],
+            duration: formatTime(recordingTime),
+            status: 'published',
+            audioUrl: audioUrl
+          });
+          showToast('Recording saved successfully!', 'success');
+          loadPodcasts();
+      })
+      .catch(err => {
+          console.error(err);
+          showToast('Failed to save recording', 'error');
+          // Rollback
+          setPodcasts(prev => prev.filter(p => p.id !== tempId));
+      });
+      
+    // Reset immediately for next take
+    setRecordedBlob(null);
+    setAudioUrl(null);
+    setRecordingTime(0);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans pt-16 pb-8">
+      <TopNav />
+      
+      <main className="max-w-[1800px] mx-auto px-4 fade-in h-[calc(100vh-100px)] flex flex-col">
+        {/* Header / Mode Switcher */}
+        <div className="flex items-center justify-between mb-6 shrink-0">
+           <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+                 <div className={`w-3 h-3 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-600'}`}></div>
+                 Podcast Studio
+              </h1>
+              <div className="bg-gray-900 rounded-lg p-1 flex border border-gray-800">
+                 <button 
+                   onClick={() => setActiveTab('studio')}
+                   className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${activeTab === 'studio' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
+                 >
+                    Studio
+                 </button>
+                 <button 
+                   onClick={() => setActiveTab('episodes')}
+                   className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${activeTab === 'episodes' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
+                 >
+                    Episodes
+                 </button>
+              </div>
+           </div>
+           
+           {activeTab === 'studio' && (
+             <div className="flex items-center gap-4">
+                <div className="px-4 py-2 bg-gray-900 rounded-lg border border-gray-800 font-mono text-xl text-green-500 shadow-inner">
+                   {formatTime(recordingTime)}
+                </div>
+                {!isRecording ? (
+                   <button 
+                     onClick={startRecording}
+                     className="flex items-center gap-2 px-6 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold shadow-lg shadow-red-900/20 transition hover:scale-105"
+                   >
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                      REC
+                   </button>
+                ) : (
+                   <button 
+                     onClick={stopRecording}
+                     className="flex items-center gap-2 px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-bold border border-gray-700 transition"
+                   >
+                      <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
+                      STOP
+                   </button>
+                )}
+             </div>
+           )}
+        </div>
+        
+        {activeTab === 'episodes' ? (
+          /* EPISODES LIST REDESIGN */
+          <div className="grid grid-cols-12 gap-8 h-full overflow-hidden">
+             {/* Create Column */}
+             <div className="col-span-12 lg:col-span-4 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                <div className="bg-[#111] rounded-xl p-6 border border-gray-800 shadow-xl">
+                   <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                      <i className="fas fa-plus-circle text-purple-500"></i> New Session
+                   </h3>
+                   <div className="space-y-5">
+                      <div>
+                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Episode Title</label>
+                         <input 
+                           type="text" 
+                           value={newEpisode.title}
+                           onChange={(e) => setNewEpisode({...newEpisode, title: e.target.value})}
+                           className="w-full bg-black/50 border border-gray-800 rounded-lg px-4 py-3 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition text-sm"
+                           placeholder="e.g. The Future of AI"
+                         />
+                      </div>
+                      <div>
+                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Topic / Theme</label>
+                         <input 
+                           type="text" 
+                           value={newEpisode.topic}
+                           onChange={(e) => setNewEpisode({...newEpisode, topic: e.target.value})}
+                           className="w-full bg-black/50 border border-gray-800 rounded-lg px-4 py-3 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition text-sm"
+                           placeholder="e.g. Technology"
+                         />
+                      </div>
+                      <button 
+                        onClick={handleCreateEpisode}
+                        className="w-full py-4 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-sm uppercase tracking-wider shadow-lg shadow-purple-900/20 transition mt-2"
+                      >
+                         Initialize Session
+                      </button>
+                   </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-6 border border-gray-800 flex-1 relative overflow-hidden group">
+                   <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                   <div className="relative z-10 flex flex-col h-full justify-between">
+                       <div>
+                           <h3 className="font-bold text-white mb-2">Quick Record</h3>
+                           <p className="text-sm text-gray-400">Skip the metadata and jump straight into the booth.</p>
+                       </div>
+                       <button 
+                         onClick={() => setActiveTab('studio')}
+                         className="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2"
+                       >
+                          <i className="fas fa-microphone-alt"></i> Open Studio
+                       </button>
+                   </div>
+                </div>
+             </div>
+
+             {/* List Column */}
+             <div className="col-span-12 lg:col-span-8 bg-[#111] rounded-xl border border-gray-800 flex flex-col overflow-hidden shadow-2xl">
+                <div className="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-900/50">
+                   <h3 className="font-bold text-gray-200">Library</h3>
+                   <span className="text-xs text-gray-500">{podcasts.length} items</span>
+                </div>
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
+                   {podcasts.length === 0 ? (
+                      <div className="h-full flex flex-col items-center justify-center text-gray-600 gap-4">
+                         <div className="w-20 h-20 rounded-full bg-gray-900 flex items-center justify-center border border-gray-800">
+                             <i className="fas fa-wave-square text-3xl opacity-50"></i>
+                         </div>
+                         <p>Archive is empty.</p>
+                      </div>
+                   ) : (
+                      podcasts.map((podcast) => (
+                         <div key={podcast.id} className="bg-black/40 border border-gray-800/50 p-4 rounded-lg flex items-center justify-between hover:border-gray-700 hover:bg-gray-800/30 transition group">
+                            <div className="flex items-center gap-5">
+                               <div className={`w-10 h-10 rounded flex items-center justify-center text-lg ${podcast.status === 'published' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
+                                  <i className={`fas fa-${podcast.status === 'published' ? 'check-circle' : 'clock'}`}></i>
+                               </div>
+                               <div>
+                                  <h4 className="font-bold text-gray-200 group-hover:text-white transition">{podcast.title}</h4>
+                                  <div className="flex items-center gap-3 text-xs text-gray-500 font-mono mt-1">
+                                     <span>{podcast.duration}</span>
+                                     <span className="w-1 h-1 bg-gray-700 rounded-full"></span>
+                                     <span>{new Date().toLocaleDateString()}</span>
+                                  </div>
+                               </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition">
+                               {podcast.audioUrl && (
+                                  <a href={podcast.audioUrl} target="_blank" rel="noreferrer" className="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded text-gray-400 hover:text-white transition" title="Download">
+                                     <i className="fas fa-download text-sm"></i>
+                                  </a>
+                               )}
+                               <button 
+                                 onClick={() => {
+                                    if(confirm('Delete recording?')) {
+                                       podcastService.deletePodcast(podcast.id!).then(loadPodcasts);
+                                    }
+                                 }}
+                                 className="w-8 h-8 flex items-center justify-center hover:bg-red-500/20 rounded text-gray-400 hover:text-red-500 transition"
+                               >
+                                  <i className="fas fa-trash text-sm"></i>
+                               </button>
+                            </div>
+                         </div>
+                      ))
+                   )}
+                </div>
+             </div>
+          </div>
+        ) : (
+          /* STUDIO LAYOUT REDESIGN */
+          <div className="grid grid-cols-12 gap-6 h-full min-h-0">
+            
+            {/* Left Rack: Audio Chain (Col-3) */}
+            <div className="col-span-12 lg:col-span-3 bg-[#111] rounded-xl border border-gray-800 flex flex-col overflow-hidden shadow-2xl">
+               <div className="p-4 bg-gray-900/50 border-b border-gray-800 font-bold text-xs text-gray-400 uppercase tracking-widest flex justify-between items-center">
+                  <span>Signal Chain</span>
+                  <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+               </div>
+               
+               <div className="p-4 overflow-y-auto custom-scrollbar space-y-6">
+                  {/* Gain Stage */}
+                  <div className="bg-black/40 rounded-lg p-4 border border-gray-800">
+                     <div className="flex justify-between items-center mb-4">
+                        <label className="text-xs font-bold text-gray-500">INPUT GAIN</label>
+                        <span className="text-xs font-mono text-purple-400">{Math.round(inputGain * 100)}%</span>
+                     </div>
+                     <input 
+                        type="range" 
+                        min="0" max="2" step="0.1"
+                        value={inputGain}
+                        onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            setInputGain(val);
+                            if (gainNode) gainNode.gain.value = val;
+                        }}
+                        className="w-full accent-purple-600 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer" 
+                     />
+                  </div>
+
+                  {/* DSP Presets (Rack Units) */}
+                  <div className="space-y-2">
+                     <label className="text-xs font-bold text-gray-500 block mb-2">DSP PRESETS</label>
+                     {PRESETS.map((preset) => (
+                       <button 
+                         key={preset.id}
+                         onClick={() => setSelectedPreset(preset.id)}
+                         className={`w-full flex items-center gap-3 p-3 rounded border transition-all relative overflow-hidden group ${
+                           selectedPreset === preset.id 
+                             ? 'bg-purple-900/20 border-purple-500/50 text-white' 
+                             : 'bg-gray-800/30 border-transparent text-gray-400 hover:bg-gray-800'
+                         }`}
+                       >
+                          {selectedPreset === preset.id && (
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
+                          )}
+                          <div className={`w-8 h-8 rounded flex items-center justify-center ${selectedPreset === preset.id ? 'text-purple-400' : 'text-gray-600'}`}>
+                             <i className={`fas fa-${preset.icon}`}></i>
+                          </div>
+                          <div className="text-left">
+                             <div className="text-xs font-bold tracking-wide">{preset.label.toUpperCase()}</div>
+                             <div className="text-[10px] opacity-60 font-mono">{preset.desc}</div>
+                          </div>
+                       </button>
+                     ))}
+                  </div>
+               </div>
+            </div>
+
+            {/* Center Stage: Visualizer (Col-6) */}
+            <div className="col-span-12 lg:col-span-6 flex flex-col gap-6">
+               <div className="flex-1 bg-black rounded-xl border border-gray-800 relative overflow-hidden shadow-2xl flex flex-col">
+                  {/* Grid Overlay */}
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
+                  
+                  {/* Main Visualizer */}
+                  <div className="flex-1 flex items-center justify-center relative z-10">
+                     <div className="flex items-end gap-[2px] h-48 w-full px-12 justify-center">
+                       {Array.from(visualData).slice(0, 64).map((value, i) => (
+                         <div 
+                           key={i} 
+                           className={`flex-1 rounded-t-sm transition-all duration-75 ${isRecording ? 'bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-gray-800'}`}
+                           style={{ 
+                             height: isRecording ? `${Math.max(4, value)}px` : '2px',
+                             opacity: isRecording ? 1 : 0.3
+                           }}
+                         ></div>
+                       ))}
+                     </div>
+                  </div>
+
+                  {/* Transport Bar */}
+                  <div className="h-20 bg-[#0a0a0a] border-t border-gray-800 flex items-center justify-between px-8 relative z-20">
+                     <div className="flex items-center gap-4">
+                        {recordedBlob && !isRecording && (
+                           <button 
+                             onClick={saveRecording} 
+                             disabled={isUploading} 
+                             className="text-xs font-bold text-green-500 border border-green-500/30 bg-green-500/10 px-4 py-2 rounded hover:bg-green-500/20 transition flex items-center gap-2"
+                           >
+                              {isUploading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-save"></i>}
+                              SAVE TAKE
+                           </button>
+                        )}
+                     </div>
+                     
+                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                         {!isRecording ? (
+                            <button onClick={startRecording} className="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.4)] transition hover:scale-110">
+                               <i className="fas fa-microphone"></i>
+                            </button>
+                         ) : (
+                            <button onClick={stopRecording} className="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 text-white flex items-center justify-center border border-gray-600 transition">
+                               <div className="w-4 h-4 bg-white rounded-sm"></div>
+                            </button>
+                         )}
+                     </div>
+
+                     <div className="flex items-center gap-2">
+                        {audioUrl && !isRecording && (
+                           <audio controls src={audioUrl} className="h-8 w-64 opacity-80 invert" />
+                        )}
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* Right Column: Teleprompter (Col-3) */}
+            <div className="col-span-12 lg:col-span-3 bg-[#111] rounded-xl border border-gray-800 flex flex-col overflow-hidden shadow-2xl">
+               <div className="p-4 bg-gray-900/50 border-b border-gray-800 flex justify-between items-center">
+                  <h3 className="font-bold text-xs text-gray-400 uppercase tracking-widest">Teleprompter</h3>
+                  <div className="flex gap-1">
+                     <button onClick={() => setFontSize(s => Math.max(12, s - 2))} className="w-6 h-6 bg-gray-800 rounded text-xs hover:bg-gray-700">A-</button>
+                     <button onClick={() => setFontSize(s => Math.min(48, s + 2))} className="w-6 h-6 bg-gray-800 rounded text-xs hover:bg-gray-700">A+</button>
+                  </div>
+               </div>
+               
+               <div className="p-3 border-b border-gray-800 flex flex-col gap-3 bg-black/20">
+                  <select 
+                    className="w-full bg-black border border-gray-800 rounded px-2 py-1.5 text-xs text-gray-300 outline-none"
+                    onChange={(e) => {
+                        const script = scripts.find(s => s.id === e.target.value);
+                        if (script) setTeleprompterText(script.content || script.script); 
+                    }}
+                  >
+                     <option value="">Load Script...</option>
+                     {scripts.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                  </select>
+                  
+                  <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => setIsPrompterPlaying(!isPrompterPlaying)}
+                        className={`flex-1 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition ${isPrompterPlaying ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}
+                      >
+                         {isPrompterPlaying ? 'Pause' : 'Scroll'}
+                      </button>
+                      <input 
+                        type="range" min="0" max="5" step="0.5" 
+                        value={prompterSpeed} 
+                        onChange={e => setPrompterSpeed(parseFloat(e.target.value))}
+                        className="w-20 accent-gray-500 h-1 bg-gray-800 rounded appearance-none" 
+                      />
+                  </div>
+               </div>
+
+               <div className="flex-1 relative bg-black">
+                   <textarea 
+                      ref={prompterRef}
+                      className="w-full h-full bg-black p-6 text-gray-300 resize-none outline-none leading-relaxed font-sans font-medium text-center"
+                      style={{ fontSize: `${fontSize}px` }}
+                      placeholder="Paste script here or select from library..."
+                      value={teleprompterText}
+                      onChange={(e) => setTeleprompterText(e.target.value)}
+                   ></textarea>
+                   
+                   {/* Guide Lines */}
+                   <div className="absolute top-1/2 left-0 right-0 h-12 -mt-6 border-y border-red-500/20 bg-red-500/5 pointer-events-none z-10"></div>
+                   <div className="absolute left-2 top-1/2 -translate-y-1/2 text-red-500/50 text-xl pointer-events-none">▶</div>
+                   <div className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500/50 text-xl pointer-events-none">◀</div>
+               </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
