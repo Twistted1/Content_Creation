@@ -195,11 +195,13 @@ export default function Script() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans pb-8 transition-colors duration-200">
       <TopNav />
       
-      <main className="max-w-[1600px] mx-auto px-4 pt-24 fade-in">
+      <main className="max-w-[1600px] mx-auto px-6 fade-in">
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">📝 Script Writer</h1>
-            <p className="text-gray-600 dark:text-gray-400">AI-powered script generation and transcript management</p>
+            <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+              <i className="fas fa-file-alt text-purple-500"></i> Script Writer
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">AI-powered script generation and transcript management</p>
           </div>
           <button 
             onClick={() => { setTitle(''); setScriptContent(''); }}
@@ -305,7 +307,7 @@ export default function Script() {
             </div>
             
             {/* Saved Scripts List */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-h-[300px] overflow-y-auto border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+            <div className="bg-white dark:bg-[#13161f] rounded-2xl p-6 max-h-[300px] overflow-y-auto border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none">
               <h3 className="font-bold mb-4 text-gray-900 dark:text-white">☁️ Saved in Cloud</h3>
               {savedScripts.length === 0 ? (
                  <p className="text-sm text-gray-500 dark:text-gray-400">No saved scripts yet.</p>
@@ -315,11 +317,11 @@ export default function Script() {
                     <div 
                       key={script.id} 
                       onClick={() => loadScriptContent(script)}
-                      className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition flex justify-between items-center group border border-gray-100 dark:border-transparent"
+                      className="p-4 bg-gray-50 dark:bg-[#0b0e14]/50 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-all hover:translate-y-[-2px] rounded-lg text-sm cursor-pointer flex justify-between items-center group shadow-sm dark:shadow-none"
                     >
-                      <span className="truncate flex-1 pr-2 text-gray-700 dark:text-gray-200">{script.title}</span>
+                      <span className="truncate flex-1 pr-2 text-gray-900 dark:text-white font-medium">{script.title}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-500 whitespace-nowrap">{new Date(script.date).toLocaleDateString()}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(script.date).toLocaleDateString()}</span>
                         <button 
                           onClick={(e) => deleteScript(script.id!, e)}
                           className={`p-1 transition opacity-0 group-hover:opacity-100 text-xs font-bold rounded px-1.5 ${

@@ -19,10 +19,12 @@ export function Footer() {
               The ultimate AI-powered content creation suite for creators, by creators.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-twitter"></i></a>
-              <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-instagram"></i></a>
-              <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-youtube"></i></a>
-              <a href="#" className="text-gray-400 hover:text-white transition"><i className="fab fa-linkedin"></i></a>
+              <a href="https://x.com/novusexchange" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition"><i className="fab fa-twitter"></i></a>
+              <a href="https://instagram.com/novusexchange" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition"><i className="fab fa-instagram"></i></a>
+              <a href="https://tiktok.com/@marcioeditions" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition"><i className="fab fa-tiktok"></i></a>
+              <a href="https://youtube.com/@novusexchange" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition"><i className="fab fa-youtube"></i></a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition"><i className="fab fa-discord"></i></a>
+              <a href="https://novusexchange.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition"><i className="fas fa-globe"></i></a>
             </div>
           </div>
 

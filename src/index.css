@@ -1,24 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   CONTENTFLOW PRO — DESIGN SYSTEM v2
+   Color strategy: true-black base, electric blue-violet primary, 
+   vivid per-feature accents (no muted/dead blues or grey-purples)
+   ───────────────────────────────────────────────────────────────────────────── */
+
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* ── Brand Tokens ── */
+  --brand-blue:    #0066FF;
+  --brand-violet:  #7000FF;
+  --brand-cyan:    #00E5FF;
+  --brand-green:   #00E676;
+  --brand-amber:   #FFB300;
+  --brand-red:     #FF3D3D;
+
+  /* ── Gradient (primary CTA, used by .gradient-bg) ── */
+  --gradient-primary: linear-gradient(135deg, #0066FF 0%, #7000FF 100%);
+  --gradient-glow:    0 0 40px rgba(0, 102, 255, 0.35);
 }
 
-@layer base {
-  h1 {
-    @apply text-2xl font-semibold;
-  }
-}
-
+/* ──────────────────────────────────────────────────────────
+   BODY — True black base for dark mode, clean white for light
+   ────────────────────────────────────────────────────────── */
 body {
   margin: 0;
   min-width: 320px;
@@ -26,50 +42,151 @@ body {
   @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200;
 }
 
-/* Custom Styles from User */
+/* ──────────────────────────────────────────────────────────
+   .gradient-bg — Primary CTA: Electric Blue → Vivid Violet
+   Replaces old muted indigo-purple (#4f46e5 → #7c3aed)
+   ────────────────────────────────────────────────────────── */
 .gradient-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
+  color: #fff;
+}
+.gradient-bg:hover {
+  filter: brightness(1.12) saturate(1.1);
 }
 
+/* ──────────────────────────────────────────────────────────
+   DARK MODE SURFACE OVERRIDES
+   Force true-black surfaces instead of the old navy-grey tones.
+   Applied at .dark scope so light mode stays clean.
+   ────────────────────────────────────────────────────────── */
+.dark {
+  /* Deep background */
+  --surface-bg:     #0a0a0a;
+  --surface-card:   #111111;
+  --surface-raised: #161616;
+  --surface-hover:  #1a1a1a;
+  --border-subtle:  rgba(255, 255, 255, 0.06);
+  --border-normal:  rgba(255, 255, 255, 0.09);
+  --border-strong:  rgba(255, 255, 255, 0.16);
+}
+
+/* ──────────────────────────────────────────────────────────
+   GLOBAL DARK MODE CARD / PANEL REFINEMENTS
+   These patch the existing Tailwind dark: classes to use the
+   true-black palette without touching every component file.
+   ────────────────────────────────────────────────────────── */
+
+/* Page backgrounds */
+.dark .bg-gray-900 { background-color: #0a0a0a !important; }
+.dark .bg-gray-800 { background-color: #111111 !important; }
+.dark .bg-gray-700 { background-color: #171717 !important; }
+
+/* Borders */
+.dark .border-gray-700 { border-color: rgba(255,255,255,0.07) !important; }
+.dark .border-gray-600 { border-color: rgba(255,255,255,0.10) !important; }
+
+/* Subtle tinted panels (e.g., bg-gray-700/30, bg-gray-800/50) */
+/* Note: Tailwind opacity variants can't easily be overridden, 
+   but the base values above cascade correctly for most uses. */
+
+/* ──────────────────────────────────────────────────────────
+   ACCENT COLOR CLASSES — vivid, per-feature use
+   ────────────────────────────────────────────────────────── */
+.accent-blue   { color: var(--brand-blue);   }
+.accent-violet { color: var(--brand-violet); }
+.accent-cyan   { color: var(--brand-cyan);   }
+.accent-green  { color: var(--brand-green);  }
+.accent-amber  { color: var(--brand-amber);  }
+.accent-red    { color: var(--brand-red);    }
+
+.bg-accent-blue   { background-color: rgba(0, 102, 255, 0.15); }
+.bg-accent-violet { background-color: rgba(112, 0, 255, 0.15); }
+.bg-accent-cyan   { background-color: rgba(0, 229, 255, 0.12); }
+.bg-accent-green  { background-color: rgba(0, 230, 118, 0.12); }
+.bg-accent-amber  { background-color: rgba(255, 179, 0, 0.12); }
+.bg-accent-red    { background-color: rgba(255, 61, 61, 0.12); }
+
+/* ──────────────────────────────────────────────────────────
+   CARD COMPONENT — Sharp, dark, premium
+   ────────────────────────────────────────────────────────── */
 .card-hover {
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
-
+.dark .card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.09);
+}
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
+/* ──────────────────────────────────────────────────────────
+   TAB ACTIVE — Blue accent, not the old muted indigo
+   ────────────────────────────────────────────────────────── */
 .tab-active {
-  border-bottom: 3px solid #667eea;
-  color: #667eea;
+  border-bottom: 2px solid var(--brand-blue);
+  color: var(--brand-blue);
 }
 
+/* ──────────────────────────────────────────────────────────
+   SECONDARY GRADIENT — subtle for sparkbars, workflows
+   ────────────────────────────────────────────────────────── */
+.gradient-secondary {
+  background: linear-gradient(90deg, var(--brand-blue) 0%, var(--brand-cyan) 100%);
+}
+
+/* ──────────────────────────────────────────────────────────
+   ANIMATIONS
+   ────────────────────────────────────────────────────────── */
 .pulse {
   animation: pulse 2s infinite;
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50%       { opacity: 0.45; }
 }
 
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   UTILITIES
+   ────────────────────────────────────────────────────────── */
 .progress-bar {
   transition: width 0.5s ease;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-.timeline-item {
-  position: relative;
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track  { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb  {
+  background: rgba(255,255,255,0.12);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
 }
 
+/* ──────────────────────────────────────────────────────────
+   TIMELINE / WORKFLOW
+   ────────────────────────────────────────────────────────── */
+.timeline-item { position: relative; }
 .timeline-item::before {
   content: '';
   position: absolute;
@@ -79,31 +196,9 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #667eea;
-  border: 2px solid white;
-}
-
-.loading-spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  background: var(--brand-blue);
+  border: 2px solid rgba(255,255,255,0.2);
+  box-shadow: 0 0 8px rgba(0, 102, 255, 0.4);
 }
 
 .workflow-line {
@@ -112,43 +207,91 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, var(--brand-blue), var(--brand-violet));
   z-index: 0;
 }
 
-.codeblock {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+/* ──────────────────────────────────────────────────────────
+   LOADING SPINNER — brand color
+   ────────────────────────────────────────────────────────── */
+.loading-spinner {
+  border: 2px solid rgba(255,255,255,0.08);
+  border-top: 2px solid var(--brand-blue);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 0.8s linear infinite;
 }
 
+/* ──────────────────────────────────────────────────────────
+   SPARKBAR — data visualizations
+   ────────────────────────────────────────────────────────── */
+.sparkbar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+.sparkbar > div {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan));
+}
+
+/* ──────────────────────────────────────────────────────────
+   MONOSPACE / CODE
+   ────────────────────────────────────────────────────────── */
+.codeblock,
 .kbd {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+}
+.kbd {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: 6px;
+  font-size: 11px;
 }
 
+/* ──────────────────────────────────────────────────────────
+   TAGS / BADGES
+   ────────────────────────────────────────────────────────── */
 .tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 999px;
-  font-size: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.06);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
 }
 
-.sparkbar {
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
+/* ──────────────────────────────────────────────────────────
+   GLOW EFFECTS — used on primary CTAs / active states
+   ────────────────────────────────────────────────────────── */
+.glow-blue   { box-shadow: 0 0 20px rgba(0, 102, 255, 0.40); }
+.glow-green  { box-shadow: 0 0 16px rgba(0, 230, 118, 0.35); }
+.glow-red    { box-shadow: 0 0 16px rgba(255, 61, 61, 0.40);  }
+.glow-violet { box-shadow: 0 0 20px rgba(112, 0, 255, 0.35); }
 
-.sparkbar > div {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+/* ──────────────────────────────────────────────────────────
+   SHIMMER SKELETON — loading states
+   ────────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  0%   { background-position:  200% 0; }
+  100% { background-position: -200% 0; }
 }

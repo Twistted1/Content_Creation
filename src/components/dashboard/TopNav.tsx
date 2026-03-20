@@ -137,17 +137,14 @@ export function TopNav() {
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 w-[240px]">
-            <div className="w-9 h-9 gradient-bg rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <i className="fas fa-bolt text-white text-sm"></i>
-            </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-              ContentFlow
+            <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent flex items-center">
+              ContentFlow <span className="ml-1.5 text-[10px] bg-amber-500/20 text-amber-500 border border-amber-500/50 px-1 py-0.5 rounded tracking-wider uppercase self-center">PRO</span>
             </span>
           </Link>
 
           {/* Center Navigation */}
-          <div className="hidden xl:flex items-center justify-center flex-1 px-8">
-            <div className="flex items-center bg-gray-100/50 dark:bg-gray-900/50 rounded-full p-1 border border-gray-200 dark:border-gray-800">
+          <div className="hidden lg:flex items-center justify-center flex-1 px-4">
+            <div className="flex items-center bg-gray-100/50 dark:bg-gray-900/50 rounded-full p-1 border border-gray-200 dark:border-gray-800 shadow-sm">
               {mainNavItems.map((item) => (
                 <Link
                   key={item.path}
@@ -162,9 +159,12 @@ export function TopNav() {
               ))}
               
               {/* More Menu */}
-              <div className="relative group px-4 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-white cursor-pointer">
-                <span>More <i className="fas fa-chevron-down text-xs ml-1"></i></span>
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl hidden group-hover:block p-2">
+              <div className="relative group px-3 py-1.5 ml-1">
+                <button className="flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-white bg-transparent group-hover:bg-gray-100 dark:group-hover:bg-gray-800 px-3 py-1 rounded-full transition-all">
+                  <span>More</span>
+                  <i className="fas fa-chevron-down text-xs transition-transform group-hover:rotate-180"></i>
+                </button>
+                <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl hidden group-hover:block p-2 animate-in fade-in slide-in-from-top-2 z-50">
                   {secondaryNavItems.map(item => (
                     <Link key={item.path} to={item.path} className="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-white">
                       {item.name}
@@ -183,15 +183,6 @@ export function TopNav() {
                  <span className="text-xs text-red-400 font-medium">Offline</span>
                </div>
              )}
-
-             {/* Theme Toggle */}
-             <button
-              onClick={toggleTheme}
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-white transition-colors"
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              <i className={`fas fa-${theme === 'dark' ? 'sun' : 'moon'}`}></i>
-            </button>
 
             <Link 
               to="/pricing" 
@@ -274,10 +265,10 @@ export function TopNav() {
             <div className="h-6 w-px bg-gray-200 dark:bg-gray-800"></div>
 
             {/* Profile */}
-            <div className="relative" ref={profileRef}>
+            <div className="relative flex items-center h-full" ref={profileRef}>
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                className="flex items-center justify-center hover:opacity-80 transition-opacity"
               >
                 <div className="w-8 h-8 gradient-bg rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md">
                   {user.email?.charAt(0).toUpperCase()}

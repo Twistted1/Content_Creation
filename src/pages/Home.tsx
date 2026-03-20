@@ -5,7 +5,6 @@ import { ActiveProjects } from '@/components/dashboard/ActiveProjects';
 import { WeekSchedule } from '@/components/dashboard/WeekSchedule';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { UsageStats } from '@/components/dashboard/UsageStats';
-import { TeamOnline } from '@/components/dashboard/TeamOnline';
 import { QuickStart } from '@/components/dashboard/QuickStart';
 import { FileText, Eye, Users, DollarSign, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -55,21 +54,44 @@ export default function Home() {
     <div className="min-h-screen pb-8">
       <TopNav />
 
-      <main className="max-w-[1600px] mx-auto px-4 pt-24 pb-12 fade-in">
-        {/* Welcome Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold mb-1 flex items-center gap-2 text-gray-900 dark:text-white">
-              Welcome back, {userName}! <span className="text-xl">👋</span>
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Here's your content overview for today</p>
+      <main className="max-w-[1600px] mx-auto px-4 pt-20 pb-12 fade-in">
+        {/* Main Header Area */}
+        <div className="mb-8">
+          <div className="flex items-end justify-between border-b border-gray-200 dark:border-gray-800 pb-6">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1 tracking-tight">
+                Dashboard
+              </h1>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest">Welcome back, {userName}</p>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              {/* Compact Team Avatars */}
+              <div className="flex items-center gap-3 pr-6 border-r border-gray-200 dark:border-gray-800">
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-[10px] font-bold text-white border-2 border-white dark:border-gray-900 shadow-sm">JD</div>
+                  <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-[10px] font-bold text-white border-2 border-white dark:border-gray-900 shadow-sm">SK</div>
+                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold text-white border-2 border-white dark:border-gray-900 shadow-sm">MR</div>
+                  <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-[10px] font-bold text-gray-500 border-2 border-white dark:border-gray-900 shadow-sm">+3</div>
+                </div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">Team Live</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button 
+                  className="px-4 py-2 rounded-lg font-bold text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all border border-gray-200 dark:border-gray-700"
+                >
+                  View Reports
+                </button>
+                <button 
+                  onClick={() => navigate('/ideas')}
+                  className="gradient-bg px-5 py-2 rounded-lg font-bold text-xs flex items-center gap-2 text-white shadow-lg shadow-purple-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  <Plus size={14} /> New Project
+                </button>
+              </div>
+            </div>
           </div>
-          <button 
-            onClick={() => navigate('/ideas')}
-            className="flex items-center gap-2 bg-[#6366f1] hover:bg-[#5558e6] text-white px-4 py-2 rounded-xl font-bold transition shadow-lg shadow-indigo-900/20 text-sm"
-          >
-            <Plus size={16} /> New Project
-          </button>
         </div>
 
         {/* Stats Row */}
@@ -139,7 +161,6 @@ export default function Home() {
             <WeekSchedule />
             <div>
               <UsageStats />
-              <TeamOnline />
             </div>
           </div>
         </div>

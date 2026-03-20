@@ -293,16 +293,16 @@ export default function Teleprompter() {
 
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white font-sans pt-16 pb-8 overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans pb-8 transition-colors duration-200">
       <TopNav />
       
       {/* Input Modal */}
       {showInputModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-           <div className="bg-gray-800 p-6 rounded-2xl w-full max-w-lg border border-gray-700 shadow-2xl">
-              <h3 className="text-xl font-bold mb-4">📝 Manual Script Entry</h3>
+           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-lg border border-gray-200 dark:border-gray-700 shadow-2xl">
+              <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">📝 Manual Script Entry</h3>
               <textarea 
-                className="w-full h-64 bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-200 outline-none focus:ring-2 focus:ring-purple-500 mb-4"
+                className="w-full h-64 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-gray-900 dark:text-gray-200 outline-none focus:ring-2 focus:ring-purple-500 mb-4"
                 placeholder="Paste or type your script here..."
                 value={customInputText}
                 onChange={(e) => setCustomInputText(e.target.value)}
@@ -310,7 +310,7 @@ export default function Teleprompter() {
               <div className="flex gap-3 justify-end">
                  <button 
                    onClick={() => setShowInputModal(false)}
-                   className="px-4 py-2 text-gray-400 hover:text-white"
+                   className="px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
                  >
                     Cancel
                  </button>
@@ -320,7 +320,7 @@ export default function Teleprompter() {
                       setShowInputModal(false);
                       showToast('Script updated', 'success');
                    }}
-                   className="px-6 py-2 gradient-bg rounded-lg font-bold"
+                   className="px-6 py-2 gradient-bg text-white rounded-lg font-bold hover:opacity-90 transition"
                  >
                     Load Script
                  </button>
@@ -329,243 +329,232 @@ export default function Teleprompter() {
         </div>
       )}
 
-      {/* Main Container */}
-      <main className="relative h-[calc(100vh-64px)] w-full flex">
-        
-        {/* Background Layer (Visuals) */}
-        <div className="absolute inset-0 bg-black z-0 flex items-center justify-center overflow-hidden">
-           {mode === 'webcam' ? (
-              <video 
-                ref={videoRef} 
-                autoPlay 
-                muted 
-                className={`w-full h-full object-cover ${mirror ? 'scale-x-[-1]' : ''}`}
-              />
-           ) : (
-              <div className="relative w-full h-full bg-gray-900">
-                 {/* Customizable Avatar / Background */}
-                 {avatarImage ? (
-                    <img 
-                       src={avatarImage} 
-                       className="w-full h-full object-cover opacity-80"
-                       alt="Custom Avatar"
-                    />
-                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center text-gray-600">
-                           <i className="fas fa-user-astronaut text-9xl mb-4 opacity-20"></i>
-                           <p>No Avatar Selected</p>
-                           <p className="text-sm">Upload an image or select "Webcam"</p>
+      <main className="max-w-[1600px] mx-auto px-6 fade-in">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+              <i className="fas fa-desktop text-blue-500"></i> Teleprompter Suite
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">Professional auto-scrolling teleprompter with voice tracking</p>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-4 gap-6 h-[calc(100vh-12rem)] min-h-[600px]">
+          {/* Main Teleprompter Window */}
+          <div className="lg:col-span-3 relative bg-black rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none flex flex-col">
+            {/* Background Layer (Visuals) */}
+            <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
+               {mode === 'webcam' ? (
+                  <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    muted 
+                    className={`w-full h-full object-cover ${mirror ? 'scale-x-[-1]' : ''}`}
+                  />
+               ) : (
+                  <div className="relative w-full h-full bg-[#05060A]">
+                     {/* Customizable Avatar / Background */}
+                     {avatarImage ? (
+                        <img 
+                           src={avatarImage} 
+                           className="w-full h-full object-cover opacity-80"
+                           alt="Custom Avatar"
+                        />
+                     ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center text-gray-600">
+                               <i className="fas fa-user-astronaut text-8xl mb-4 opacity-20"></i>
+                               <p className="font-medium">No Avatar Selected</p>
+                               <p className="text-sm">Upload an image or select "Webcam"</p>
+                            </div>
                         </div>
-                    </div>
-                 )}
-                 
-                 <div className="absolute bottom-10 left-10 text-white/50 font-mono text-sm">
-                    <i className="fas fa-circle text-green-500 mr-2 text-[10px] animate-pulse"></i>
-                    MODE: {avatarImage ? 'CUSTOM AVATAR' : 'DEFAULT'}
-                 </div>
-              </div>
-           )}
-        </div>
-        
-        {/* Teleprompter Overlay Layer */}
-        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-           <div 
-             className={`w-full max-w-4xl h-full p-12 text-center leading-relaxed transition-all duration-300 pointer-events-auto outline-none custom-scrollbar overflow-y-auto no-scrollbar`}
-             style={{ 
-               fontSize: `${fontSize}px`, 
-               opacity: opacity,
-               transform: mirror ? 'scaleX(-1)' : 'none',
-               textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
-             }}
-             ref={textRef}
-           >
-              {/* Padding to allow scrolling text to start from middle */}
-              <div className="h-[40vh]"></div>
-              <p className="whitespace-pre-wrap font-bold text-white">
-                 {isVoiceMode ? renderPrompterText() : prompterText}
-              </p>
-              <div className="h-[40vh]"></div>
-              
-              {/* Center Marker */}
-              <div className="fixed top-1/2 left-0 right-0 h-1 bg-red-500/50 z-20 pointer-events-none flex items-center justify-between px-4">
-                 <i className="fas fa-caret-right text-red-500 text-2xl"></i>
-                 <i className="fas fa-caret-left text-red-500 text-2xl"></i>
-              </div>
-           </div>
-        </div>
-
-        {/* Controls Sidebar (Floating) */}
-        <div className={`absolute top-6 right-6 z-30 bg-gray-900/90 backdrop-blur-md border border-gray-700 rounded-2xl shadow-2xl transition-all duration-300 ${isControlsOpen ? 'w-80 p-6' : 'w-12 h-12 p-0 overflow-hidden flex items-center justify-center'}`}>
-           <div className="flex items-center justify-between mb-6">
-              {isControlsOpen && (
-                <>
-                  <h2 className="font-bold text-xl">🎬 Teleprompter</h2>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                    <button onClick={() => setIsControlsOpen(false)} className="text-gray-400 hover:text-white">
-                      <i className="fas fa-compress-alt"></i>
-                    </button>
+                     )}
+                     
+                     <div className="absolute bottom-6 left-6 text-white/50 font-mono text-xs tracking-widest bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur">
+                        <i className="fas fa-circle text-green-500 mr-2 text-[8px] animate-pulse"></i>
+                        MODE: {avatarImage ? 'CUSTOM AVATAR' : 'DEFAULT'}
+                     </div>
                   </div>
-                </>
-              )}
-           </div>
+               )}
+            </div>
+            
+            {/* Teleprompter Overlay Layer */}
+            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+               <div 
+                 className="w-full max-w-4xl h-full p-12 text-center leading-relaxed transition-all duration-300 pointer-events-auto outline-none overflow-y-auto scrollbar-hide"
+                 style={{ 
+                   fontSize: `${fontSize}px`, 
+                   opacity: opacity,
+                   transform: mirror ? 'scaleX(-1)' : 'none',
+                   textShadow: '2px 2px 8px rgba(0,0,0,0.9)'
+                 }}
+                 ref={textRef}
+               >
+                  {/* Padding to allow scrolling text to start from middle */}
+                  <div className="h-[40vh]"></div>
+                  <p className="whitespace-pre-wrap font-bold text-white tracking-wide">
+                     {isVoiceMode ? renderPrompterText() : prompterText}
+                  </p>
+                  <div className="h-[40vh]"></div>
+                  
+                  {/* Center Marker */}
+                  <div className="fixed top-1/2 left-0 right-0 h-[2px] bg-purple-500/50 z-20 pointer-events-none flex items-center justify-between px-6">
+                     <i className="fas fa-caret-right text-purple-500 text-3xl drop-shadow-md"></i>
+                     <i className="fas fa-caret-left text-purple-500 text-3xl drop-shadow-md"></i>
+                  </div>
+               </div>
+            </div>
+          </div>
 
-           {!isControlsOpen && (
-             <button onClick={() => setIsControlsOpen(true)} className="w-full h-full text-white hover:text-purple-400">
-               <i className="fas fa-sliders-h"></i>
-             </button>
-           )}
+          {/* Settings Sidebar */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none flex flex-col gap-6 overflow-y-auto scrollbar-hide">
+             {/* Source Selection */}
+             <div>
+               <h3 className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Input Source</h3>
+               <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-1 flex">
+                  <button 
+                    onClick={() => setMode('avatar')}
+                    className={`flex-1 py-2 rounded-lg text-xs font-bold tracking-wide transition ${mode === 'avatar' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
+                  >
+                     <i className="fas fa-image mr-2"></i>Avatar
+                  </button>
+                  <button 
+                    onClick={() => setMode('webcam')}
+                    className={`flex-1 py-2 rounded-lg text-xs font-bold tracking-wide transition ${mode === 'webcam' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
+                  >
+                     <i className="fas fa-camera mr-2"></i>Webcam
+                  </button>
+               </div>
+             </div>
+             
+             {/* Custom Avatar Upload */}
+             {mode === 'avatar' && (
+                <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-center">
+                   <input 
+                     type="file" 
+                     accept="image/*" 
+                     className="hidden" 
+                     ref={avatarInputRef}
+                     onChange={handleAvatarUpload}
+                   />
+                   <button 
+                     onClick={() => avatarInputRef.current?.click()}
+                     className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition uppercase tracking-wide"
+                   >
+                      <i className="fas fa-cloud-upload-alt mr-2 text-lg block mb-2"></i>
+                      {avatarImage ? 'Change Image' : 'Upload Image'}
+                   </button>
+                </div>
+             )}
 
-           {isControlsOpen && (
-             <>
-           {/* Source Selection */}
-           <div className="bg-gray-800 rounded-xl p-1 flex mb-6">
-              <button 
-                onClick={() => setMode('avatar')}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${mode === 'avatar' ? 'bg-purple-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-              >
-                 <i className="fas fa-image mr-2"></i>Avatar
-              </button>
-              <button 
-                onClick={() => setMode('webcam')}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${mode === 'webcam' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-              >
-                 <i className="fas fa-camera mr-2"></i>Webcam
-              </button>
-           </div>
-           
-           {/* Custom Avatar Upload (Visible only in Avatar mode) */}
-           {mode === 'avatar' && (
-              <div className="mb-6 p-4 bg-gray-800 rounded-xl border border-dashed border-gray-600 text-center">
-                 <input 
-                   type="file" 
-                   accept="image/*" 
-                   className="hidden" 
-                   ref={avatarInputRef}
-                   onChange={handleAvatarUpload}
-                 />
-                 <button 
-                   onClick={() => avatarInputRef.current?.click()}
-                   className="text-sm text-gray-400 hover:text-white transition"
-                 >
-                    <i className="fas fa-cloud-upload-alt mr-2"></i>
-                    {avatarImage ? 'Change Avatar Image' : 'Upload Avatar / BG'}
-                 </button>
-              </div>
-           )}
+             {/* Script Selector & Upload */}
+             <div>
+                <h3 className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Script</h3>
+                <select 
+                  value={selectedScriptId}
+                  onChange={(e) => setSelectedScriptId(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
+                >
+                   <option value="">-- Select Saved Script --</option>
+                   {scripts.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                </select>
 
-           {/* Script Selector & Upload */}
-           <div className="mb-6 space-y-3">
-              <label className="text-xs text-gray-400 font-bold uppercase tracking-wider block">Script Source</label>
-              
-              <select 
-                value={selectedScriptId}
-                onChange={(e) => setSelectedScriptId(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              >
-                 <option value="">-- Select Saved Script --</option>
-                 {scripts.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
-              </select>
+                <div className="flex gap-2">
+                   <button 
+                     onClick={() => setShowInputModal(true)}
+                     className="flex-1 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition"
+                   >
+                      <i className="fas fa-pen mr-1"></i> Manual
+                   </button>
+                   <button 
+                     onClick={() => fileInputRef.current?.click()}
+                     className="flex-1 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition"
+                   >
+                      <i className="fas fa-file-upload mr-1"></i> Upload
+                   </button>
+                   <input 
+                     type="file" 
+                     accept=".txt" 
+                     className="hidden" 
+                     ref={fileInputRef}
+                     onChange={handleFileUpload}
+                   />
+                </div>
+             </div>
 
-              <div className="flex gap-2">
-                 <button 
-                   onClick={() => setShowInputModal(true)}
-                   className="flex-1 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs hover:bg-gray-700"
-                 >
-                    <i className="fas fa-pen mr-1"></i> Manual Input
-                 </button>
-                 <button 
-                   onClick={() => fileInputRef.current?.click()}
-                   className="flex-1 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs hover:bg-gray-700"
-                 >
-                    <i className="fas fa-file-upload mr-1"></i> Upload .txt
-                 </button>
-                 <input 
-                   type="file" 
-                   accept=".txt" 
-                   className="hidden" 
-                   ref={fileInputRef}
-                   onChange={handleFileUpload}
-                 />
-              </div>
-           </div>
+             {/* Playback Controls */}
+             <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <button 
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition shadow-md mb-3 ${isPlaying ? 'bg-red-500 hover:bg-red-600 text-white' : 'gradient-bg hover:opacity-90 text-white'}`}
+                >
+                   <i className={`fas fa-${isPlaying ? 'pause' : 'play'}`}></i>
+                   {isPlaying ? 'PAUSE SCROLL' : 'START SCROLL'}
+                </button>
+                
+                <button 
+                  onClick={() => setIsVoiceMode(!isVoiceMode)}
+                  className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${isVoiceMode ? 'bg-blue-500 text-white shadow-lg animate-pulse' : 'bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'}`}
+                  title="Experimental: Highlights spoken words"
+                >
+                   <i className="fas fa-microphone"></i>
+                   {isVoiceMode ? 'LISTENING (VOICE SYNC)' : 'ENABLE VOICE SYNC'}
+                </button>
+             </div>
 
-           {/* Playback Controls */}
-           <div className="grid grid-cols-2 gap-2 mb-6">
-              <button 
-                onClick={() => setIsPlaying(!isPlaying)}
-                className={`py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition ${isPlaying ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'bg-green-500/20 text-green-400 border border-green-500/50'}`}
-              >
-                 <i className={`fas fa-${isPlaying ? 'pause' : 'play'}`}></i>
-                 {isPlaying ? 'PAUSE' : 'SCROLL'}
-              </button>
-              
-              <button 
-                onClick={() => setIsVoiceMode(!isVoiceMode)}
-                className={`py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${isVoiceMode ? 'bg-blue-500 text-white shadow-lg animate-pulse' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
-                title="Experimental: Highlights spoken words"
-              >
-                 <i className="fas fa-microphone"></i>
-                 {isVoiceMode ? 'LISTENING' : 'VOICE MODE'}
-              </button>
-           </div>
+             {/* Sliders */}
+             <div className="space-y-5 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div>
+                   <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+                      <span>Speed</span>
+                      <span className="text-purple-500">{speed}x</span>
+                   </div>
+                   <input 
+                     type="range" min="0.5" max="5" step="0.5"
+                     value={speed}
+                     onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                     className="w-full accent-purple-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                   />
+                </div>
+                
+                <div>
+                   <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+                      <span>Font Size</span>
+                      <span className="text-purple-500">{fontSize}px</span>
+                   </div>
+                   <input 
+                     type="range" min="18" max="72" step="2"
+                     value={fontSize}
+                     onChange={(e) => setFontSize(parseInt(e.target.value))}
+                     className="w-full accent-purple-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                   />
+                </div>
 
-           {/* Sliders */}
-           <div className="space-y-4">
-              <div>
-                 <div className="flex justify-between text-xs text-gray-400 mb-1">
-                    <span>Speed</span>
-                    <span>{speed}x</span>
-                 </div>
-                 <input 
-                   type="range" min="0.5" max="5" step="0.5"
-                   value={speed}
-                   onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                   className="w-full accent-purple-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                 />
-              </div>
-              
-              <div>
-                 <div className="flex justify-between text-xs text-gray-400 mb-1">
-                    <span>Font Size</span>
-                    <span>{fontSize}px</span>
-                 </div>
-                 <input 
-                   type="range" min="18" max="72" step="2"
-                   value={fontSize}
-                   onChange={(e) => setFontSize(parseInt(e.target.value))}
-                   className="w-full accent-blue-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                 />
-              </div>
+                <div>
+                   <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+                      <span>Opacity</span>
+                      <span className="text-purple-500">{Math.round(opacity * 100)}%</span>
+                   </div>
+                   <input 
+                     type="range" min="0.1" max="1" step="0.1"
+                     value={opacity}
+                     onChange={(e) => setOpacity(parseFloat(e.target.value))}
+                     className="w-full accent-purple-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                   />
+                </div>
+             </div>
 
-              <div>
-                 <div className="flex justify-between text-xs text-gray-400 mb-1">
-                    <span>Opacity</span>
-                    <span>{Math.round(opacity * 100)}%</span>
-                 </div>
-                 <input 
-                   type="range" min="0.1" max="1" step="0.1"
-                   value={opacity}
-                   onChange={(e) => setOpacity(parseFloat(e.target.value))}
-                   className="w-full accent-white h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                 />
-              </div>
-           </div>
-
-           {/* Toggles */}
-           <div className="mt-6 flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                 <div className={`w-10 h-6 rounded-full p-1 transition-colors ${mirror ? 'bg-purple-600' : 'bg-gray-700'}`} onClick={() => setMirror(!mirror)}>
-                    <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform ${mirror ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                 </div>
-                 <span className="text-sm text-gray-300">Mirror Mode</span>
-              </label>
-           </div>
-           </>
-           )}
+             {/* Toggles */}
+             <div className="mt-auto pt-4 flex items-center justify-between">
+                <label className="flex items-center gap-3 cursor-pointer">
+                   <div className={`w-10 h-6 rounded-full p-1 transition-colors ${mirror ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'}`} onClick={() => setMirror(!mirror)}>
+                      <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform ${mirror ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                   </div>
+                   <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Mirror Mode</span>
+                </label>
+             </div>
+          </div>
         </div>
-
       </main>
     </div>
   );

@@ -14,6 +14,7 @@ interface AutoRule {
 export default function Publish() {
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const [posts, setPosts] = useState<Post[]>([]);
 
@@ -97,6 +98,10 @@ export default function Publish() {
   // Load posts from Firebase
   useEffect(() => {
     loadPosts();
+    // Close any open menu when clicking outside
+    const handleClickOutside = () => setActiveMenu(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const loadPosts = async () => {
@@ -105,6 +110,33 @@ export default function Publish() {
       setPosts(data);
     } catch (error) {
       console.error("Failed to load posts", error);
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    if (!window.confirm('Delete this scheduled post?')) return;
+    try {
+      await publishService.deletePost(postId);
+      setPosts(prev => prev.filter(p => p.id !== postId));
+      showToast('Post deleted', 'success');
+    } catch (error) {
+      console.error('Failed to delete post', error);
+      showToast('Failed to delete post', 'error');
+    } finally {
+      setActiveMenu(null);
+    }
+  };
+
+  const handleMarkPublished = async (postId: string) => {
+    try {
+      await publishService.updatePost(postId, { status: 'published' });
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, status: 'published' } : p));
+      showToast('Post marked as published', 'success');
+    } catch (error) {
+      console.error('Failed to update post', error);
+      showToast('Failed to update post', 'error');
+    } finally {
+      setActiveMenu(null);
     }
   };
 
@@ -229,7 +261,7 @@ export default function Publish() {
                {isYoutubeConnected ? 'Connected' : 'Connect YouTube'}
              </button>
              <button 
-               onClick={handleSchedulePost}
+               onClick={() => handleSchedulePost()}
                className="gradient-bg px-6 py-2 rounded-lg font-medium hover:opacity-90 transition flex items-center gap-2 text-white shadow-lg shadow-purple-900/20"
              >
                <i className="fas fa-calendar-plus"></i> Schedule Post
@@ -243,7 +275,7 @@ export default function Publish() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full border border-gray-200 dark:border-gray-700 shadow-2xl">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">Schedule Post</h3>
-                <button onClick={() => setShowScheduleModal(false)} className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                <button onClick={() => setShowScheduleModal(false)} aria-label="Close schedule modal" className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
                   <i className="fas fa-times"></i>
                 </button>
               </div>
@@ -264,6 +296,7 @@ export default function Publish() {
                   <select
                     value={scheduleForm.platform}
                     onChange={e => setScheduleForm(f => ({ ...f, platform: e.target.value as Post['platform'] }))}
+                    aria-label="Select platform"
                     className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
                   >
                     <option value="youtube">YouTube</option>
@@ -281,6 +314,7 @@ export default function Publish() {
                       type="date"
                       value={scheduleForm.date}
                       onChange={e => setScheduleForm(f => ({ ...f, date: e.target.value }))}
+                      aria-label="Publication date"
                       className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
                     />
                   </div>
@@ -290,6 +324,7 @@ export default function Publish() {
                       type="time"
                       value={scheduleForm.time}
                       onChange={e => setScheduleForm(f => ({ ...f, time: e.target.value }))}
+                      aria-label="Publication time"
                       className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
                     />
                   </div>
@@ -299,6 +334,7 @@ export default function Publish() {
                   <select
                     value={scheduleForm.type}
                     onChange={e => setScheduleForm(f => ({ ...f, type: e.target.value as Post['type'] }))}
+                    aria-label="Content type"
                     className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
                   >
                     <option value="video">Video</option>
@@ -326,7 +362,7 @@ export default function Publish() {
              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full border border-gray-200 dark:border-gray-700 shadow-2xl">
                <div className="flex justify-between items-center mb-6">
                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Connect Platforms</h3>
-                 <button onClick={() => setShowConnectModal(false)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                 <button onClick={() => setShowConnectModal(false)} aria-label="Close connect modal" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
                    <i className="fas fa-times"></i>
                  </button>
                </div>
@@ -408,12 +444,14 @@ export default function Publish() {
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}
+                      aria-label="Previous month"
                       className="p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
                     >
                       <i className="fas fa-chevron-left"></i>
                     </button>
                     <button 
                       onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}
+                      aria-label="Next month"
                       className="p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
                     >
                       <i className="fas fa-chevron-right"></i>
@@ -445,7 +483,7 @@ export default function Publish() {
                                         {day}
                                     </span>
                                     {/* Quick Add Button on Hover */}
-                                    <button className="opacity-0 group-hover:opacity-100 transition p-1 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400">
+                                    <button aria-label="Add post to this day" className="opacity-0 group-hover:opacity-100 transition p-1 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400">
                                         <i className="fas fa-plus-circle"></i>
                                     </button>
                                 </div>
@@ -513,7 +551,33 @@ export default function Publish() {
                         }`}>
                           {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
                         </span>
-                        <button className="text-gray-400 hover:text-gray-900 dark:hover:text-white"><i className="fas fa-ellipsis-v"></i></button>
+                        <div className="relative">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === post.id ? null : (post.id ?? null)); }}
+                            aria-label="Post actions"
+                            className="text-gray-400 hover:text-gray-900 dark:hover:text-white p-1 rounded"
+                          >
+                            <i className="fas fa-ellipsis-v"></i>
+                          </button>
+                          {activeMenu === post.id && (
+                            <div className="absolute right-0 top-8 z-30 w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden">
+                              {post.status === 'scheduled' && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleMarkPublished(post.id!); }}
+                                  className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-green-600 dark:text-green-400"
+                                >
+                                  <i className="fas fa-check-circle"></i> Mark Published
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDeletePost(post.id!); }}
+                                className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-red-500 dark:text-red-400"
+                              >
+                                <i className="fas fa-trash"></i> Delete Post
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -544,6 +608,7 @@ export default function Publish() {
                           className="sr-only peer" 
                           checked={rule.enabled}
                           onChange={() => toggleRule(rule.id)}
+                          aria-label={`Toggle ${rule.name}`}
                         />
                         <div className="w-9 h-5 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
                       </label>
@@ -558,7 +623,7 @@ export default function Publish() {
           {/* Sidebar - Takes up 1/4 space */}
           <div className="space-y-6">
             {/* Upcoming Summary */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 h-full border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none transition-colors duration-200 flex flex-col">
+            <div className="bg-white dark:bg-[#13161f] rounded-2xl p-6 h-full border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none transition-colors duration-200 flex flex-col">
               <h3 className="font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
                   <i className="fas fa-clock text-purple-500"></i> Upcoming
               </h3>
@@ -590,7 +655,7 @@ export default function Publish() {
                 )}
               </div>
               
-              <button onClick={handleSchedulePost} className="w-full mt-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-purple-500 hover:text-purple-500 transition text-sm font-medium">
+              <button onClick={() => handleSchedulePost()} className="w-full mt-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-purple-500 hover:text-purple-500 transition text-sm font-medium">
                   + Add New
               </button>
             </div>

@@ -223,10 +223,14 @@ export default function Automation() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans pb-8 transition-colors duration-200">
       <TopNav />
       
-      <main className="max-w-[1600px] mx-auto px-4 pt-24 fade-in">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">⚡ Workflow Automation</h1>
-          <p className="text-gray-600 dark:text-gray-400">Create automated pipelines for your content creation</p>
+      <main className="max-w-[1600px] mx-auto px-6 fade-in">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+              <i className="fas fa-bolt text-yellow-500"></i> Workflow Automation
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">Create automated pipelines for your content creation</p>
+          </div>
         </div>
 
         {/* Active Workflows */}

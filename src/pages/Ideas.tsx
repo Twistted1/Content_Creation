@@ -23,11 +23,11 @@ function SortableIdea({ idea, onDelete, onEdit, onClick }: { idea: IdeaData; onD
       style={style} 
       {...attributes} 
       {...listeners}
-      className="p-3 bg-white dark:bg-gray-700/30 rounded-lg text-sm flex justify-between items-center group cursor-grab active:cursor-grabbing mb-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition border border-gray-200 dark:border-transparent shadow-sm dark:shadow-none"
+      className="p-4 bg-gray-50 dark:bg-[#0b0e14]/50 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-all hover:translate-y-[-2px] rounded-lg text-sm flex justify-between items-center group cursor-grab active:cursor-grabbing mb-2 shadow-sm dark:shadow-none"
     >
       <div className="flex-1 truncate pr-2" onClick={(e) => { e.stopPropagation(); onClick(idea); }}>
-        <span className="font-medium text-gray-900 dark:text-gray-200">{idea.title}</span>
-        <span className="ml-2 text-xs text-gray-500 dark:text-gray-500">({idea.platform})</span>
+        <span className="font-medium text-gray-900 dark:text-white">{idea.title}</span>
+        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">({idea.platform})</span>
       </div>
       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition" onPointerDown={(e) => e.stopPropagation()}>
         <button 
@@ -166,10 +166,12 @@ export default function Ideas() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans pb-8 transition-colors duration-200">
       <TopNav />
       
-      <main className="max-w-[1600px] mx-auto px-4 pt-24 fade-in">
+      <main className="max-w-[1600px] mx-auto px-6 fade-in">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">💡 Idea Generation</h1>
-          <p className="text-gray-600 dark:text-gray-400">Generate viral content ideas powered by AI</p>
+          <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+            <i className="fas fa-lightbulb text-yellow-500"></i> Idea Generation
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">Generate viral content ideas powered by AI</p>
         </div>
 
         {/* Edit Modal */}
@@ -256,10 +258,10 @@ export default function Ideas() {
               <div className="space-y-3">
                 {generatedIdeas.length > 0 ? (
                   generatedIdeas.map((idea, index) => (
-                    <div key={index} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl flex items-center justify-between group hover:bg-gray-100 dark:hover:bg-gray-700 transition animate-in fade-in slide-in-from-bottom-2 border border-gray-200 dark:border-transparent">
+                    <div key={index} className="p-4 bg-gray-50 dark:bg-[#0b0e14]/50 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-all hover:translate-y-[-2px] rounded-xl flex items-center justify-between group animate-in fade-in slide-in-from-bottom-2 shadow-sm dark:shadow-none">
                       <div className="flex-1 cursor-pointer group-hover:pl-2 transition-all duration-300" onClick={() => handleIdeaClick(idea)} title="Click to generate script">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-bold text-purple-600 dark:text-purple-300 group-hover:text-purple-700 dark:group-hover:text-white transition">{idea.title}</h3>
+                          <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">{idea.title}</h3>
                           <span className={`text-xs px-2 py-0.5 rounded ${idea.difficulty === 'easy' ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300' : idea.difficulty === 'medium' ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300' : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-300'}`}>
                             {idea.difficulty}
                           </span>

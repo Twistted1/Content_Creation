@@ -98,14 +98,12 @@ export default function Pricing() {
     <div className="min-h-screen bg-gray-900 text-white font-sans pt-20 pb-12">
       <TopNav />
       
-      <main className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Simple, Transparent Pricing
+      <main className="max-w-[1600px] mx-auto px-6 fade-in">
+        <div className="mb-8 text-center max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white flex items-center justify-center gap-3">
+            <i className="fas fa-tags text-purple-500"></i> Pricing Plans
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Choose the plan that fits your content creation journey. Cancel anytime.
-          </p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg">Choose the perfect plan for your content creation needs</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">

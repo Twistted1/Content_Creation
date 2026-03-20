@@ -1,20 +1,16 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
-console.log("Loading function...");
-
+// 1. Initialize App (ONLY ONCE)
 if (!admin.apps.length) {
     admin.initializeApp();
 }
 
-console.log("Initialized app...");
-
-// NOTE: We removed the "const stripe = ..." line from here.
-// This prevents the deploy tool from crashing on your computer.
-
+// 2. Export Functions
+// Note: We do NOT initialize Stripe here to avoid "missing key" errors during deployment
 exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
-    // 1. Initialize Stripe INSIDE the function.
-    // Support both functions.config() (Gen 1 legacy) and process.env (Gen 2 / dotenv)
+    // 3. Initialize Stripe INSIDE the function handler
+    // This ensures it only runs when the function is actually CALLED, not when it's DEPLOYED
     const stripeSecret = functions.config().stripe?.secret || process.env.STRIPE_SECRET;
     
     if (!stripeSecret) {
@@ -24,7 +20,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 
     const stripe = require('stripe')(stripeSecret);
 
-    // 2. Security Check
+    // 4. Security Check
     if (!context.auth) {
         throw new functions.https.HttpsError(
             'unauthenticated',
@@ -32,7 +28,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
         );
     }
 
-    // 3. Product Mapping
+    // 5. Product Mapping
     // Try to get price from Firestore first, fallback to hardcoded values
     let amount;
     try {
@@ -59,7 +55,7 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
         );
     }
 
-    // 4. Create Intent
+    // 6. Create Intent
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,

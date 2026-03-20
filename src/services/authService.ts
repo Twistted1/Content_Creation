@@ -52,10 +52,9 @@ export const authService = {
 
   // Auth State Observer
   onAuthStateChanged: (callback: (user: User | null) => void) => {
-    // If there's already a current user, callback immediately to avoid "flicker"
-    if (auth.currentUser) {
-        callback(auth.currentUser);
-    }
+    // Firebase's onAuthStateChanged fires synchronously on first call if a user
+    // is already cached. Do NOT pre-call here — it causes double invocations and
+    // state flicker (AuthContext would render twice on load).
     return onAuthStateChanged(auth, callback);
   },
 
