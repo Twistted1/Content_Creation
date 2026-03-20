@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PodcastStudio from '../components/podcast/PodcastStudio';
 import { TopNav } from '@/components/dashboard/TopNav';
 import { podcastService, PodcastData } from '@/services/podcastService';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 const PodcastPage = () => {
   const { user } = useAuth();

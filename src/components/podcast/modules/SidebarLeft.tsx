@@ -35,10 +35,10 @@ export function SidebarLeft() {
 
   return (
     <div className="flex h-full flex-col gap-3 min-w-0 w-[15rem]">
-      <Panel title="SIGNAL CHAIN" className="min-h-0 flex-1">
+      <Panel title="SIGNAL CHAIN" className="min-h-0 flex-1 bg-[#111] border-white/5">
         <div className="flex h-full min-h-0 flex-col gap-3">
-          <div className="rounded-md border border-slate-700/60 bg-[#161925] p-4 shadow-inner">
-            <div className="mb-4 flex items-center justify-between text-[11px] font-bold tracking-wider text-slate-400">
+          <div className="rounded-xl border border-white/5 bg-black/40 p-4 shadow-inner">
+            <div className="mb-4 flex items-center justify-between text-[10px] font-black tracking-[0.2em] text-white/40 uppercase">
               <span>INPUT GAIN</span>
               <span className="text-violet-400">{gain}%</span>
             </div>
@@ -48,33 +48,32 @@ export function SidebarLeft() {
               max={100}
               value={gain}
               onChange={(e) => setGain(Number(e.target.value))}
-              className="w-full accent-violet-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-violet-500 h-1 bg-white/10 rounded-full appearance-none cursor-pointer"
             />
           </div>
 
-          <div className="mt-2 text-[10px] font-bold tracking-widest text-slate-500 uppercase">DSP Presets</div>
-          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 pb-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          <div className="mt-2 text-[10px] font-black tracking-[0.3em] text-white/20 uppercase">DSP PRESETS</div>
+          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 pb-2 scrollbar-hide">
             {presets.map((preset) => (
               <button
                 key={preset.id}
                 type="button"
                 onClick={() => setActivePreset(preset.id)}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-lg border px-2 py-2 text-left transition-all",
+                  "flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition-all group",
                   activePreset === preset.id
-                    ? "border-violet-500/50 bg-violet-900/20 shadow-[0_0_15px_rgba(139,92,246,0.1)]"
-                    : "border-slate-800 bg-[#1A1D2A] hover:border-slate-600 hover:bg-[#1E2230]"
+                    ? "border-violet-500/50 bg-violet-600/10 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
+                    : "border-white/5 bg-white/5 hover:border-white/10 hover:bg-white/10"
                 )}
-                title={`Activate ${preset.name} profile`}
               >
                 <div className={cn(
-                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-800 text-[10px]",
-                  activePreset === preset.id ? "text-violet-400" : "text-slate-400"
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-black/40 text-xs transition-colors",
+                  activePreset === preset.id ? "text-violet-400" : "text-white/20"
                 )}>
                   🎙️
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={cn("text-[11px] font-bold tracking-wide truncate", activePreset === preset.id ? "text-violet-200" : "text-slate-200")}>
+                  <p className={cn("text-[11px] font-black tracking-widest truncate", activePreset === preset.id ? "text-white" : "text-white/40")}>
                     {preset.name}
                   </p>
                 </div>
@@ -85,8 +84,8 @@ export function SidebarLeft() {
       </Panel>
 
       {/* Soundboard */}
-      <Panel title="SOUNDBOARD" className="min-h-0 h-[220px] bg-[#161925]" actions={<IconButton label="Add sound" tooltipPos="right"><PlusIcon className="h-3 w-3" /></IconButton>}>
-        <div className="grid grid-cols-2 gap-2 overflow-y-auto pr-1 pb-1 scrollbar-thin scrollbar-thumb-slate-700">
+      <Panel title="SOUNDBOARD" className="min-h-0 h-[220px] bg-[#111] border-white/5">
+        <div className="grid grid-cols-2 gap-2 overflow-y-auto pr-1 pb-1 scrollbar-hide">
           {soundClips.map((clip) => (
             <motion.button
               key={clip.id}
@@ -94,11 +93,10 @@ export function SidebarLeft() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveClip(clip.id)}
               className={cn(
-                "rounded-lg border px-1 py-2.5 text-[10px] font-bold tracking-wide transition-all truncate",
-                clip.colorClass,
-                activeClip === clip.id ? "ring-2 ring-white/50 brightness-125" : "hover:brightness-110"
+                "rounded-xl border px-1 py-3.5 text-[10px] font-black tracking-widest transition-all truncate uppercase",
+                clip.colorClass.replace('bg-violet-900/40', 'bg-violet-600/10').replace('text-violet-300', 'text-violet-400').replace('bg-orange-900/40', 'bg-orange-600/10').replace('text-orange-300', 'text-orange-400').replace('bg-sky-900/40', 'bg-sky-600/10').replace('text-sky-300', 'text-sky-400').replace('bg-rose-900/40', 'bg-rose-600/10').replace('text-rose-300', 'text-rose-400').replace('bg-emerald-900/40', 'bg-emerald-600/10').replace('text-emerald-300', 'text-emerald-400').replace('bg-slate-800/80', 'bg-white/5').replace('text-slate-300', 'text-white/40'),
+                activeClip === clip.id ? "ring-2 ring-white/20 scale-[1.02] brightness-125" : "hover:brightness-110"
               )}
-              title={`Play ${clip.label}`}
             >
               {clip.label}
             </motion.button>

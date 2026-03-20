@@ -24,17 +24,16 @@ export function MainScreen() {
     <div className="flex min-h-0 flex-col gap-3 h-full">
       <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-700/60 bg-[#0F111A] shadow-xl">
         {/* Top Floating Controls */}
-        <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-lg border border-slate-700/50 bg-[#161925]/90 px-2 py-1.5 shadow-lg backdrop-blur">
+        <div className="absolute left-6 top-6 z-10 flex items-center gap-2 rounded-xl border border-white/5 bg-black/60 px-2 py-2 shadow-2xl backdrop-blur-xl">
           <button
             type="button"
             onClick={() => setMainView("teleprompter")}
             className={cn(
-              "rounded-md px-3 py-1 text-[11px] font-bold tracking-wider transition-colors",
+              "rounded-lg px-4 py-1.5 text-[10px] font-black tracking-[0.2em] transition-all",
               mainView === "teleprompter"
-                ? "bg-violet-600/90 text-white shadow"
-                : "bg-transparent text-slate-400 hover:text-slate-200"
+                ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40 translate-y-[-1px]"
+                : "bg-transparent text-white/30 hover:text-white"
             )}
-            title="Show teleprompter on the main screen"
           >
             PROMPT
           </button>
@@ -42,27 +41,26 @@ export function MainScreen() {
             type="button"
             onClick={() => setMainView("camera")}
             className={cn(
-              "rounded-md px-3 py-1 text-[11px] font-bold tracking-wider transition-colors",
+              "rounded-lg px-4 py-1.5 text-[10px] font-black tracking-[0.2em] transition-all",
               mainView === "camera"
-                ? "bg-emerald-600/90 text-white shadow"
-                : "bg-transparent text-slate-400 hover:text-slate-200"
+                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/40 translate-y-[-1px]"
+                : "bg-transparent text-white/30 hover:text-white"
             )}
-            title="Show camera on the main screen"
           >
             CAMERA
           </button>
         </div>
 
         {/* Floating Icons */}
-        <div className="absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-lg border border-slate-700/50 bg-[#161925]/90 px-1 py-1 shadow-lg backdrop-blur">
-          <IconButton label="Toggle Video Input" className="h-7 w-7 border-none bg-transparent hover:bg-slate-700/50" active={mainView === "camera"}>
+        <div className="absolute right-6 top-6 z-10 flex items-center gap-2 rounded-xl border border-white/5 bg-black/60 px-2 py-2 shadow-2xl backdrop-blur-xl">
+          <IconButton label="Toggle Video Input" className="h-8 w-8 border-none bg-transparent hover:bg-white/5" active={mainView === "camera"}>
             <VideoIcon className="h-4 w-4" />
           </IconButton>
-          <IconButton label="Toggle Microphone Input" className="h-7 w-7 border-none bg-transparent hover:bg-slate-700/50" active>
+          <IconButton label="Toggle Microphone Input" className="h-8 w-8 border-none bg-transparent hover:bg-white/5" active>
             <MicIcon className="h-4 w-4" />
           </IconButton>
-          <div className="h-4 w-[1px] bg-slate-700 mx-1" />
-          <IconButton label="More options" className="h-7 w-7 border-none bg-transparent hover:bg-slate-700/50 text-slate-400">
+          <div className="h-5 w-[1px] bg-white/10 mx-1" />
+          <IconButton label="More options" className="h-8 w-8 border-none bg-transparent hover:bg-white/5 text-white/20">
             <span className="font-bold">⋯</span>
           </IconButton>
         </div>
@@ -81,10 +79,16 @@ export function MainScreen() {
               className="h-full overflow-y-auto px-[15%] py-[8%] text-center text-[2.75rem] font-medium leading-[1.6] text-slate-200 tracking-wide scroll-smooth relative"
             >
               {recording && audioVisualData.length > 0 && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                   <div className="flex items-end gap-1 h-64">
-                      {Array.from(audioVisualData).slice(0, 32).map((v, i) => (
-                        <div key={i} className="w-2 bg-violet-500 rounded-t" style={{ height: `${v/2}%` }}></div>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                   <div className="flex items-end gap-2 h-72 opacity-20">
+                      {Array.from(audioVisualData).slice(0, 48).map((v, i) => (
+                        <motion.div 
+                          key={i} 
+                          className="w-2.5 bg-gradient-to-t from-violet-600 via-emerald-500 to-emerald-400 rounded-full" 
+                          initial={{ height: 0 }}
+                          animate={{ height: `${v/2}%` }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        />
                       ))}
                    </div>
                 </div>
@@ -105,35 +109,33 @@ export function MainScreen() {
           {mainView === "teleprompter" && (
             <>
               {/* Left Play/Pause Controls */}
-              <div className="absolute left-4 top-1/2 flex -translate-y-1/2 flex-col gap-2 rounded-xl border border-slate-700/60 bg-[#161925]/90 p-2 shadow-2xl backdrop-blur">
-                <IconButton label="Start auto scroll" onClick={() => setAutoScroll(true)} className="h-9 w-9 rounded-lg border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:border-emerald-500 hover:bg-emerald-500 hover:text-white" active={autoScroll} tooltipPos="right">
+              <div className="absolute left-6 top-1/2 flex -translate-y-1/2 flex-col gap-3 rounded-2xl border border-white/5 bg-black/60 p-2 shadow-2xl backdrop-blur-xl">
+                <IconButton label="Start auto scroll" onClick={() => setAutoScroll(true)} className="h-10 w-10 rounded-xl border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white" active={autoScroll} tooltipPos="right">
                   <PlayIcon className="h-4 w-4 ml-0.5" />
                 </IconButton>
-                <IconButton label="Pause auto scroll" onClick={() => setAutoScroll(false)} className="h-9 w-9 rounded-lg border-amber-500/30 bg-amber-500/10 text-amber-400 hover:border-amber-500 hover:bg-amber-500 hover:text-white" active={!autoScroll} tooltipPos="right">
+                <IconButton label="Pause auto scroll" onClick={() => setAutoScroll(false)} className="h-10 w-10 rounded-xl border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-white" active={!autoScroll} tooltipPos="right">
                   <PauseIcon className="h-4 w-4" />
                 </IconButton>
-                <IconButton label="Reset to top" onClick={() => teleprompterViewportRef.current?.scrollTo({ top: 0, behavior: "smooth" })} className="h-9 w-9 rounded-lg border-slate-600/50 bg-slate-800 text-slate-300 hover:border-slate-500 hover:bg-slate-700 hover:text-white" tooltipPos="right">
+                <IconButton label="Reset to top" onClick={() => teleprompterViewportRef.current?.scrollTo({ top: 0, behavior: "smooth" })} className="h-10 w-10 rounded-xl border-white/5 bg-white/5 text-white/40 hover:bg-white/10 hover:text-white" tooltipPos="right">
                   <StopIcon className="h-4 w-4" />
                 </IconButton>
               </div>
 
               {/* Right Speed Controls */}
-              <div className="absolute right-4 top-1/2 flex -translate-y-1/2 flex-col items-center gap-1.5 rounded-xl border border-slate-700/60 bg-[#161925]/90 p-2 shadow-2xl backdrop-blur">
-                <span className="text-[10px] font-bold text-slate-400 mb-1 tracking-widest">SPEED</span>
+              <div className="absolute right-6 top-1/2 flex -translate-y-1/2 flex-col items-center gap-2 rounded-2xl border border-white/5 bg-black/60 p-2 shadow-2xl backdrop-blur-xl">
+                <span className="text-[9px] font-black text-white/20 mb-1 tracking-[0.2em] uppercase">SPEED</span>
                 <button
                   type="button"
                   onClick={() => setScrollSpeed((prev) => Math.min(90, prev + 5))}
-                  className="flex h-8 w-8 items-center justify-center rounded border border-slate-600/50 bg-slate-800 text-lg font-light text-slate-200 hover:border-violet-500 hover:bg-violet-500 hover:text-white transition-colors"
-                  title="Increase scroll speed"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-lg font-light text-white hover:border-violet-500 hover:bg-violet-500 transition-all"
                 >
                   +
                 </button>
-                <span className="my-1 text-[13px] font-bold text-emerald-400 font-mono w-6 text-center">{scrollSpeed}</span>
+                <span className="my-1 text-sm font-black text-emerald-400 font-mono w-8 text-center">{scrollSpeed}x</span>
                 <button
                   type="button"
                   onClick={() => setScrollSpeed((prev) => Math.max(10, prev - 5))}
-                  className="flex h-8 w-8 items-center justify-center rounded border border-slate-600/50 bg-slate-800 text-lg font-light text-slate-200 hover:border-violet-500 hover:bg-violet-500 hover:text-white transition-colors"
-                  title="Decrease scroll speed"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/5 bg-white/10 text-xl font-light text-white hover:border-violet-500 hover:bg-violet-500 transition-all"
                 >
                   -
                 </button>
