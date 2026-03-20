@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
 import { scriptService } from '@/services/scriptService';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Toast helper
 const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
   const toast = document.createElement('div');
-  toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-500 translate-y-10 opacity-0 z-50 ${
-    type === 'success' ? 'bg-green-500/90 text-white' : 
-    type === 'error' ? 'bg-red-500/90 text-white' : 
-    'bg-blue-500/90 text-white'
+  toast.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform transition-all duration-500 translate-y-10 opacity-0 z-[100] border backdrop-blur-xl ${
+    type === 'success' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 
+    type === 'error' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 
+    'bg-violet-500/10 border-violet-500/30 text-violet-400'
   }`;
-  toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-${
+  toast.innerHTML = `<div class="flex items-center gap-3 font-bold text-sm tracking-wide"><i class="fas fa-${
     type === 'success' ? 'check-circle' : 
     type === 'error' ? 'exclamation-circle' : 
     'info-circle'
-  }"></i> ${message}</div>`;
+  } text-lg"></i> ${message.toUpperCase()}</div>`;
   document.body.appendChild(toast);
   requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
   setTimeout(() => {
@@ -25,32 +26,26 @@ const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info')
 
 export default function Teleprompter() {
   const [isControlsOpen, setIsControlsOpen] = useState(true);
-  // Mode: 'webcam' | 'avatar'
   const [mode, setMode] = useState<'webcam' | 'avatar'>('avatar');
   
-  // Scripts
   const [scripts, setScripts] = useState<any[]>([]);
   const [selectedScriptId, setSelectedScriptId] = useState('');
   const [prompterText, setPrompterText] = useState('Welcome to the ContentFlow Teleprompter Suite. Select a script to begin...');
   
-  // Controls
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [fontSize, setFontSize] = useState(32);
+  const [fontSize, setFontSize] = useState(42);
   const [mirror, setMirror] = useState(false);
-  const [opacity, setOpacity] = useState(0.8);
+  const [opacity, setOpacity] = useState(0.9);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   
-  // Custom Input
   const [showInputModal, setShowInputModal] = useState(false);
   const [customInputText, setCustomInputText] = useState('');
   
-  // Custom Avatar
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
-  // Voice Recognition State
   const recognitionRef = useRef<any>(null);
   const [recognizedText, setRecognizedText] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -58,19 +53,13 @@ export default function Teleprompter() {
   const isVoiceModeRef = useRef(false);
   const lastFinalRef = useRef('');
   
-  // Auto-scroll logic
   const textRef = useRef<HTMLDivElement>(null);
-  // Webcam
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  // Initialize Speech Recognition
   useEffect(() => {
-    // Only initialize if supported
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      
-      // Prevent multiple instances
       if (!recognitionRef.current) {
           try {
               recognitionRef.current = new SpeechRecognition();
@@ -100,11 +89,8 @@ export default function Teleprompter() {
               recognitionRef.current.onerror = (event: any) => {
                 console.error('Speech recognition error', event.error);
                 setIsListening(false);
-                setIsVoiceMode(false); // Auto-off on error
-                
-                if (event.error === 'not-allowed') {
-                   showToast('Microphone access denied', 'error');
-                }
+                setIsVoiceMode(false);
+                if (event.error === 'not-allowed') showToast('Microphone access denied', 'error');
               };
               
               recognitionRef.current.onend = () => {
@@ -113,7 +99,7 @@ export default function Teleprompter() {
                    try {
                      recognitionRef.current.start();
                      setIsListening(true);
-                   } catch(e) { /* already started */ }
+                   } catch(e) {}
                  }
               };
           } catch (e) {
@@ -123,7 +109,6 @@ export default function Teleprompter() {
     }
   }, []);
 
-  // Voice Mode Toggle
   useEffect(() => {
      isVoiceModeRef.current = isVoiceMode;
      if (!recognitionRef.current) return;
@@ -133,10 +118,8 @@ export default function Teleprompter() {
            setRecognizedText('');
            recognitionRef.current.start();
            setIsListening(true);
-           showToast('Voice Tracking Enabled', 'info');
-        } catch(e) {
-           console.log("Speech start error:", e);
-        }
+           showToast('Voice Tracking Activated', 'info');
+        } catch(e) {}
      } else {
         try { recognitionRef.current.stop(); } catch(e) {}
         setIsListening(false);
@@ -145,30 +128,22 @@ export default function Teleprompter() {
      }
   }, [isVoiceMode]);
 
-  // Handle File Upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
      const file = e.target.files?.[0];
      if (!file) return;
-     
      const reader = new FileReader();
      reader.onload = (e) => {
-        const text = e.target?.result as string;
-        setPrompterText(text);
-        showToast('Script loaded from file', 'success');
+        setPrompterText(e.target?.result as string);
+        showToast('Script Imported', 'success');
      };
      reader.readAsText(file);
   };
   
-  // Handle Avatar Upload
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
      const file = e.target.files?.[0];
-     if (file) {
-        const url = URL.createObjectURL(file);
-        setAvatarImage(url);
-     }
+     if (file) setAvatarImage(URL.createObjectURL(file));
   };
 
-  // Helper to split text into spans for voice tracking
   const renderPrompterText = () => {
      const recentWords = new Set(
        recognizedText.split(/\s+/).map(w => w.replace(/[^a-z0-9]/g, '')).filter(w => w.length > 2)
@@ -180,7 +155,7 @@ export default function Teleprompter() {
           <span
              key={i}
              ref={el => wordRefs.current[i] = el}
-             className={`transition-colors duration-200 ${isSpoken ? 'text-yellow-300 font-semibold' : 'text-white'}`}
+             className={`transition-all duration-300 ${isSpoken ? 'text-amber-400 font-extrabold scale-110' : 'text-white'}`}
           >
              {word}
           </span>
@@ -188,370 +163,269 @@ export default function Teleprompter() {
      });
   };
 
-  // Load Scripts
   useEffect(() => {
-    const loadScripts = async () => {
-      try {
-        const data = await scriptService.getScripts();
-        setScripts(data);
-      } catch (error) {
-        console.error("Failed to load scripts", error);
-      }
-    };
-    loadScripts();
+    scriptService.getScripts().then(setScripts).catch(console.error);
   }, []);
 
-  // Handle Script Selection
   useEffect(() => {
     if (selectedScriptId) {
        const script = scripts.find(s => s.id === selectedScriptId);
        if (script) {
          setPrompterText(script.content || script.script || '');
-         // Reset scroll
          if (textRef.current) textRef.current.scrollTop = 0;
        }
     }
   }, [selectedScriptId, scripts]);
 
-  // Webcam Logic
   useEffect(() => {
     const startWebcam = async () => {
       if (mode === 'webcam') {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-           showToast('Webcam not supported in this browser', 'error');
-           setMode('avatar');
-           return;
-        }
-
         try {
           const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
           setStream(mediaStream);
-          if (videoRef.current) {
-            videoRef.current.srcObject = mediaStream;
-          }
-        } catch (err: any) {
-          console.warn("Webcam access failed:", err.name, err.message);
-          
-          if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-             showToast('No webcam found on this device', 'error');
-          } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-             showToast('Webcam permission denied', 'error');
-          } else {
-             showToast('Could not access webcam', 'error');
-          }
-          
-          setMode('avatar'); // Fallback
+          if (videoRef.current) videoRef.current.srcObject = mediaStream;
+        } catch (err) {
+          showToast('Webcam Access Denied', 'error');
+          setMode('avatar');
         }
-      } else {
-        // Stop webcam if switching away
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-          setStream(null);
-        }
+      } else if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        setStream(null);
       }
     };
-
     startWebcam();
-    return () => {
-      if (stream) stream.getTracks().forEach(track => track.stop());
-    };
+    return () => stream?.getTracks().forEach(t => t.stop());
   }, [mode]);
 
-  // Scroll Animation
   useEffect(() => {
     let animationFrame: number;
     let lastTime = 0;
-    
     const animate = (time: number) => {
       if (lastTime === 0) lastTime = time;
       const deltaTime = time - lastTime;
-      
       if (isPlaying && textRef.current) {
-         // Speed 1 = 20px per second approx? Let's tune it.
-         // Let's say speed 1 = 0.5px per frame (at 60fps) -> 30px/sec
-         const scrollAmount = (speed * 0.5) * (deltaTime / 16); 
-         textRef.current.scrollTop += scrollAmount;
-         
-         // Loop if end reached (optional, maybe stop)
+         textRef.current.scrollTop += (speed * 0.4) * (deltaTime / 16); 
          if (textRef.current.scrollTop + textRef.current.clientHeight >= textRef.current.scrollHeight) {
              setIsPlaying(false);
          }
       }
-      
       lastTime = time;
       animationFrame = requestAnimationFrame(animate);
     };
-    
-    if (isPlaying) {
-       animationFrame = requestAnimationFrame(animate);
-    } else {
-       cancelAnimationFrame(animationFrame!);
-    }
-    
-    return () => cancelAnimationFrame(animationFrame!);
+    if (isPlaying) animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
   }, [isPlaying, speed]);
 
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans pb-8 transition-colors duration-200">
+    <div className="min-h-screen bg-[#05060a] text-white font-sans overflow-hidden selection:bg-violet-500/30">
       <TopNav />
       
-      {/* Input Modal */}
-      {showInputModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full max-w-lg border border-gray-200 dark:border-gray-700 shadow-2xl">
-              <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">📝 Manual Script Entry</h3>
-              <textarea 
-                className="w-full h-64 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-gray-900 dark:text-gray-200 outline-none focus:ring-2 focus:ring-purple-500 mb-4"
-                placeholder="Paste or type your script here..."
-                value={customInputText}
-                onChange={(e) => setCustomInputText(e.target.value)}
-              ></textarea>
-              <div className="flex gap-3 justify-end">
-                 <button 
-                   onClick={() => setShowInputModal(false)}
-                   className="px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
-                 >
-                    Cancel
-                 </button>
-                 <button 
-                   onClick={() => {
-                      if (customInputText) setPrompterText(customInputText);
-                      setShowInputModal(false);
-                      showToast('Script updated', 'success');
-                   }}
-                   className="px-6 py-2 gradient-bg text-white rounded-lg font-bold hover:opacity-90 transition"
-                 >
-                    Load Script
-                 </button>
-              </div>
-           </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showInputModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-6"
+          >
+             <motion.div 
+               initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+               className="bg-[#111] p-8 rounded-[2rem] w-full max-w-2xl border border-white/10 shadow-[0_0_100px_rgba(139,92,246,0.15)]"
+             >
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-violet-600/20 flex items-center justify-center text-violet-500">
+                    <i className="fas fa-edit text-xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold tracking-tight">Script Editor</h3>
+                </div>
+                <textarea 
+                  className="w-full h-80 bg-black/50 border border-white/5 rounded-2xl p-6 text-xl text-gray-300 outline-none focus:border-violet-500/50 transition-all font-medium leading-relaxed"
+                  placeholder="Paste or type your script here..."
+                  value={customInputText}
+                  onChange={(e) => setCustomInputText(e.target.value)}
+                ></textarea>
+                <div className="flex gap-4 justify-end mt-8">
+                   <button onClick={() => setShowInputModal(false)} className="px-6 py-3 text-gray-400 font-bold hover:text-white transition uppercase tracking-widest text-xs">Cancel</button>
+                   <button 
+                     onClick={() => {
+                        if (customInputText) setPrompterText(customInputText);
+                        setShowInputModal(false);
+                        showToast('Script Updated', 'success');
+                     }}
+                     className="px-8 py-3 bg-violet-600 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-violet-500 transition shadow-lg shadow-violet-900/40"
+                   >
+                      Load Script
+                   </button>
+                </div>
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <main className="max-w-[1600px] mx-auto px-6 fade-in">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
-              <i className="fas fa-desktop text-blue-500"></i> Teleprompter Suite
-            </h1>
-            <p className="text-gray-500 dark:text-gray-400">Professional auto-scrolling teleprompter with voice tracking</p>
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-4 gap-6 h-[calc(100vh-12rem)] min-h-[600px]">
-          {/* Main Teleprompter Window */}
-          <div className="lg:col-span-3 relative bg-black rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none flex flex-col">
-            {/* Background Layer (Visuals) */}
+      <main className="h-screen w-full flex flex-col pt-16">
+        <div className="flex-1 flex overflow-hidden">
+          
+          {/* Main Stage */}
+          <div className="flex-1 relative bg-black group overflow-hidden">
+            {/* Visuals Layer */}
             <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
                {mode === 'webcam' ? (
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    muted 
-                    className={`w-full h-full object-cover ${mirror ? 'scale-x-[-1]' : ''}`}
-                  />
+                  <video ref={videoRef} autoPlay muted className={`w-full h-full object-cover transition-transform duration-700 ${mirror ? 'scale-x-[-1]' : ''}`} />
                ) : (
                   <div className="relative w-full h-full bg-[#05060A]">
-                     {/* Customizable Avatar / Background */}
                      {avatarImage ? (
-                        <img 
-                           src={avatarImage} 
-                           className="w-full h-full object-cover opacity-80"
-                           alt="Custom Avatar"
-                        />
+                        <img src={avatarImage} className="w-full h-full object-cover animate-pulse-slow opacity-60" alt="Avatar" />
                      ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center text-gray-600">
-                               <i className="fas fa-user-astronaut text-8xl mb-4 opacity-20"></i>
-                               <p className="font-medium">No Avatar Selected</p>
-                               <p className="text-sm">Upload an image or select "Webcam"</p>
+                            <div className="text-center opacity-20">
+                               <i className="fas fa-cube text-[12rem] mb-8 text-violet-500"></i>
+                               <p className="text-xl font-bold tracking-[0.2em] uppercase">Booth Active</p>
                             </div>
                         </div>
                      )}
-                     
-                     <div className="absolute bottom-6 left-6 text-white/50 font-mono text-xs tracking-widest bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur">
-                        <i className="fas fa-circle text-green-500 mr-2 text-[8px] animate-pulse"></i>
-                        MODE: {avatarImage ? 'CUSTOM AVATAR' : 'DEFAULT'}
+                     <div className="absolute bottom-8 left-8 flex items-center gap-3 bg-black/60 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-xl">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
+                        <span className="text-[10px] font-black tracking-widest text-white/50">{mode.toUpperCase()} MODE ACTIVE</span>
                      </div>
                   </div>
                )}
             </div>
             
-            {/* Teleprompter Overlay Layer */}
+            {/* Prompter Overlay */}
             <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
                <div 
-                 className="w-full max-w-4xl h-full p-12 text-center leading-relaxed transition-all duration-300 pointer-events-auto outline-none overflow-y-auto scrollbar-hide"
+                 className="w-full max-w-5xl h-full p-[15%] text-center font-bold tracking-tight transition-all duration-300 pointer-events-auto outline-none overflow-y-auto scrollbar-hide text-white"
                  style={{ 
                    fontSize: `${fontSize}px`, 
                    opacity: opacity,
                    transform: mirror ? 'scaleX(-1)' : 'none',
-                   textShadow: '2px 2px 8px rgba(0,0,0,0.9)'
+                   textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)'
                  }}
                  ref={textRef}
                >
-                  {/* Padding to allow scrolling text to start from middle */}
                   <div className="h-[40vh]"></div>
-                  <p className="whitespace-pre-wrap font-bold text-white tracking-wide">
+                  <div className="whitespace-pre-wrap leading-[1.6]">
                      {isVoiceMode ? renderPrompterText() : prompterText}
-                  </p>
+                  </div>
                   <div className="h-[40vh]"></div>
-                  
-                  {/* Center Marker */}
-                  <div className="fixed top-1/2 left-0 right-0 h-[2px] bg-purple-500/50 z-20 pointer-events-none flex items-center justify-between px-6">
-                     <i className="fas fa-caret-right text-purple-500 text-3xl drop-shadow-md"></i>
-                     <i className="fas fa-caret-left text-purple-500 text-3xl drop-shadow-md"></i>
+
+                  {/* Guide Rails */}
+                  <div className="fixed top-1/2 left-0 right-0 h-24 -mt-12 pointer-events-none z-20 flex items-center justify-between px-10">
+                     <div className="w-1.5 h-full rounded-full bg-gradient-to-t from-transparent via-violet-500/40 to-transparent"></div>
+                     <div className="w-1.5 h-full rounded-full bg-gradient-to-t from-transparent via-violet-500/40 to-transparent"></div>
                   </div>
                </div>
             </div>
+
+            {/* Quick Stats Overlay (Floating top info) */}
+            <div className="absolute top-8 left-8 flex items-center gap-8 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex flex-col">
+                   <span className="text-[10px] font-black text-white/30 tracking-[0.2em]">SPEED</span>
+                   <span className="text-lg font-bold text-violet-400 font-mono">{speed}x</span>
+                </div>
+                <div className="flex flex-col">
+                   <span className="text-[10px] font-black text-white/30 tracking-[0.2em]">FONT</span>
+                   <span className="text-lg font-bold text-violet-400 font-mono">{fontSize}px</span>
+                </div>
+            </div>
           </div>
 
-          {/* Settings Sidebar */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none flex flex-col gap-6 overflow-y-auto scrollbar-hide">
-             {/* Source Selection */}
-             <div>
-               <h3 className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Input Source</h3>
-               <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-1 flex">
-                  <button 
-                    onClick={() => setMode('avatar')}
-                    className={`flex-1 py-2 rounded-lg text-xs font-bold tracking-wide transition ${mode === 'avatar' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
-                  >
-                     <i className="fas fa-image mr-2"></i>Avatar
-                  </button>
-                  <button 
-                    onClick={() => setMode('webcam')}
-                    className={`flex-1 py-2 rounded-lg text-xs font-bold tracking-wide transition ${mode === 'webcam' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
-                  >
-                     <i className="fas fa-camera mr-2"></i>Webcam
-                  </button>
-               </div>
-             </div>
+          {/* Controls Sidebar */}
+          <div className="w-[380px] bg-[#0c0c0e] border-l border-white/5 p-8 flex flex-col gap-8 overflow-y-auto scrollbar-thin">
              
-             {/* Custom Avatar Upload */}
-             {mode === 'avatar' && (
-                <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-center">
-                   <input 
-                     type="file" 
-                     accept="image/*" 
-                     className="hidden" 
-                     ref={avatarInputRef}
-                     onChange={handleAvatarUpload}
-                   />
+             <div>
+                <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.3em] mb-4">Input Stream</h3>
+                <div className="bg-black/40 rounded-2xl p-1.5 flex border border-white/5">
                    <button 
-                     onClick={() => avatarInputRef.current?.click()}
-                     className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition uppercase tracking-wide"
+                     onClick={() => setMode('avatar')}
+                     className={`flex-1 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all ${mode === 'avatar' ? 'bg-violet-600 text-white shadow-[0_10px_20px_rgba(139,92,246,0.3)] scale-[1.02]' : 'text-white/40 hover:text-white'}`}
                    >
-                      <i className="fas fa-cloud-upload-alt mr-2 text-lg block mb-2"></i>
-                      {avatarImage ? 'Change Image' : 'Upload Image'}
+                      AVATAR
                    </button>
+                   <button 
+                     onClick={() => setMode('webcam')}
+                     className={`flex-1 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all ${mode === 'webcam' ? 'bg-blue-600 text-white shadow-[0_10px_20px_rgba(37,99,235,0.3)] scale-[1.02]' : 'text-white/40 hover:text-white'}`}
+                   >
+                      WEBCAM
+                   </button>
+                </div>
+             </div>
+
+             {mode === 'avatar' && (
+                <div className="group relative h-32 rounded-3xl border-2 border-dashed border-white/10 hover:border-violet-500/40 bg-black/20 flex flex-col items-center justify-center transition-all cursor-pointer overflow-hidden" onClick={() => avatarInputRef.current?.click()}>
+                   <input type="file" accept="image/*" className="hidden" ref={avatarInputRef} onChange={handleAvatarUpload} />
+                   {avatarImage ? (
+                      <img src={avatarImage} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform" alt="Avatar" />
+                   ) : (
+                      <>
+                        <i className="fas fa-plus text-white/20 text-xl mb-2 group-hover:text-violet-500 transition-colors"></i>
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Select Backdrop</span>
+                      </>
+                   )}
                 </div>
              )}
 
-             {/* Script Selector & Upload */}
              <div>
-                <h3 className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Script</h3>
+                <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.3em] mb-4">Content Source</h3>
                 <select 
                   value={selectedScriptId}
                   onChange={(e) => setSelectedScriptId(e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-4 text-sm font-bold text-white placeholder-white/20 outline-none focus:border-violet-500/50 transition-all mb-4 appearance-none"
                 >
-                   <option value="">-- Select Saved Script --</option>
-                   {scripts.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                   <option value="">-- SYSTEM REPOSITORY --</option>
+                   {scripts.map(s => <option key={s.id} value={s.id}>{s.title.toUpperCase()}</option>)}
                 </select>
 
-                <div className="flex gap-2">
-                   <button 
-                     onClick={() => setShowInputModal(true)}
-                     className="flex-1 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition"
-                   >
-                      <i className="fas fa-pen mr-1"></i> Manual
-                   </button>
-                   <button 
-                     onClick={() => fileInputRef.current?.click()}
-                     className="flex-1 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition"
-                   >
-                      <i className="fas fa-file-upload mr-1"></i> Upload
-                   </button>
-                   <input 
-                     type="file" 
-                     accept=".txt" 
-                     className="hidden" 
-                     ref={fileInputRef}
-                     onChange={handleFileUpload}
-                   />
+                <div className="flex gap-3">
+                   <button onClick={() => setShowInputModal(true)} className="flex-1 py-3 bg-white/5 border border-white/5 rounded-xl text-[10px] font-black hover:bg-white/10 transition">MANUAL</button>
+                   <button onClick={() => fileInputRef.current?.click()} className="flex-1 py-3 bg-white/5 border border-white/5 rounded-xl text-[10px] font-black hover:bg-white/10 transition">UPLOAD</button>
+                   <input type="file" accept=".txt" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
                 </div>
              </div>
 
-             {/* Playback Controls */}
-             <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+             <div className="mt-4 flex flex-col gap-4">
                 <button 
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition shadow-md mb-3 ${isPlaying ? 'bg-red-500 hover:bg-red-600 text-white' : 'gradient-bg hover:opacity-90 text-white'}`}
+                  className={`w-full py-5 rounded-2xl font-black text-[13px] tracking-[0.2em] flex items-center justify-center gap-4 transition-all active:scale-95 ${isPlaying ? 'bg-rose-600 text-white shadow-[0_15px_30px_rgba(225,29,72,0.3)]' : 'bg-violet-600 text-white shadow-[0_15px_30px_rgba(139,92,246,0.3)]'}`}
                 >
-                   <i className={`fas fa-${isPlaying ? 'pause' : 'play'}`}></i>
-                   {isPlaying ? 'PAUSE SCROLL' : 'START SCROLL'}
+                   {isPlaying ? 'PAUSE ENGINE' : 'ACTIVATE SCROLL'}
                 </button>
                 
                 <button 
                   onClick={() => setIsVoiceMode(!isVoiceMode)}
-                  className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${isVoiceMode ? 'bg-blue-500 text-white shadow-lg animate-pulse' : 'bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'}`}
-                  title="Experimental: Highlights spoken words"
+                  className={`w-full py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] flex items-center justify-center gap-3 transition-all ${isVoiceMode ? 'bg-blue-600 text-white shadow-[0_15px_30px_rgba(37,99,235,0.3)]' : 'bg-white/5 border border-white/5 text-white/40 hover:text-white'}`}
                 >
-                   <i className="fas fa-microphone"></i>
-                   {isVoiceMode ? 'LISTENING (VOICE SYNC)' : 'ENABLE VOICE SYNC'}
+                   <i className={`fas fa-microphone ${isVoiceMode ? 'animate-pulse' : ''}`}></i>
+                   {isVoiceMode ? 'VOICE SYNC ACTIVE' : 'ENABLE VOICE SYNC'}
                 </button>
              </div>
 
-             {/* Sliders */}
-             <div className="space-y-5 pt-2 border-t border-gray-200 dark:border-gray-700">
-                <div>
-                   <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">
-                      <span>Speed</span>
-                      <span className="text-purple-500">{speed}x</span>
+             <div className="space-y-8 pt-4">
+                {[
+                  { label: 'Speed', val: speed, set: setSpeed, min: 0.5, max: 5, step: 0.5, unit: 'x' },
+                  { label: 'Font Size', val: fontSize, set: setFontSize, min: 20, max: 92, step: 2, unit: 'px' },
+                  { label: 'Opacity', val: opacity, set: setOpacity, min: 0.1, max: 1, step: 0.1, unit: '%' }
+                ].map((s) => (
+                   <div key={s.label}>
+                      <div className="flex justify-between items-center mb-4">
+                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">{s.label}</span>
+                         <span className="text-xs font-bold font-mono text-violet-400">{s.label === 'Opacity' ? Math.round(s.val * 100) : s.val}{s.unit}</span>
+                      </div>
+                      <input 
+                        type="range" min={s.min} max={s.max} step={s.step} value={s.val}
+                        onChange={(e) => s.set(parseFloat(e.target.value))}
+                        className="w-full accent-violet-500 h-1 bg-white/5 rounded-full appearance-none cursor-pointer"
+                      />
                    </div>
-                   <input 
-                     type="range" min="0.5" max="5" step="0.5"
-                     value={speed}
-                     onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                     className="w-full accent-purple-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                   />
-                </div>
-                
-                <div>
-                   <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">
-                      <span>Font Size</span>
-                      <span className="text-purple-500">{fontSize}px</span>
-                   </div>
-                   <input 
-                     type="range" min="18" max="72" step="2"
-                     value={fontSize}
-                     onChange={(e) => setFontSize(parseInt(e.target.value))}
-                     className="w-full accent-purple-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                   />
-                </div>
-
-                <div>
-                   <div className="flex justify-between text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">
-                      <span>Opacity</span>
-                      <span className="text-purple-500">{Math.round(opacity * 100)}%</span>
-                   </div>
-                   <input 
-                     type="range" min="0.1" max="1" step="0.1"
-                     value={opacity}
-                     onChange={(e) => setOpacity(parseFloat(e.target.value))}
-                     className="w-full accent-purple-500 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                   />
-                </div>
+                ))}
              </div>
 
-             {/* Toggles */}
-             <div className="mt-auto pt-4 flex items-center justify-between">
-                <label className="flex items-center gap-3 cursor-pointer">
-                   <div className={`w-10 h-6 rounded-full p-1 transition-colors ${mirror ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'}`} onClick={() => setMirror(!mirror)}>
-                      <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform ${mirror ? 'translate-x-4' : 'translate-x-0'}`}></div>
-                   </div>
-                   <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Mirror Mode</span>
-                </label>
+             <div className="mt-auto pt-8 flex items-center justify-between border-t border-white/5">
+                <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Mirror Display</span>
+                <button 
+                  onClick={() => setMirror(!mirror)}
+                  className={`w-12 h-6 rounded-full p-1 transition-all duration-500 ${mirror ? 'bg-violet-600' : 'bg-white/10'}`}
+                >
+                   <div className={`w-4 h-4 bg-white rounded-full shadow-lg transform transition-transform duration-500 ${mirror ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                </button>
              </div>
           </div>
         </div>

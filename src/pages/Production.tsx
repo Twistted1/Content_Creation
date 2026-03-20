@@ -364,7 +364,7 @@ export default function Production() {
         <div className="min-h-[400px]">
           {activeTab === 'voiceover' && (
             <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-2">
-              <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+              <div className="lg:col-span-2 bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                 <h3 className="font-bold mb-4 text-gray-900 dark:text-white">🎙️ Voice Over Generator</h3>
                 <textarea 
                   value={voiceText}
@@ -507,7 +507,7 @@ export default function Production() {
               </div>
               
               <div className="space-y-4">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                   <h3 className="font-bold mb-4 text-gray-900 dark:text-white">📁 Generated Audio</h3>
                   {generatedAudioUrl ? (
                     <div className="space-y-4">
@@ -526,7 +526,7 @@ export default function Production() {
                     <p className="text-gray-500 dark:text-gray-400 text-sm">No audio generated yet.</p>
                   )}
                 </div>
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                   <h3 className="font-bold mb-4 text-gray-900 dark:text-white">💰 Estimated Cost</h3>
                   <div className="text-center">
                     <p className="text-3xl font-bold gradient-bg bg-clip-text text-transparent">
@@ -541,7 +541,7 @@ export default function Production() {
 
           {activeTab === 'voiceclone' && (
              <div className="grid lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-2">
-               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+               <div className="bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                  <h3 className="font-bold mb-2 text-gray-900 dark:text-white">🎭 Voice Clone Studio</h3>
                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Create a digital clone of your voice using ElevenLabs AI. Requires an ElevenLabs API key in Settings.</p>
 
@@ -624,7 +624,7 @@ export default function Production() {
                  </div>
                </div>
                
-               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+               <div className="bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                  <h3 className="font-bold mb-4 text-gray-900 dark:text-white">🗣️ My Cloned Voices</h3>
                  <p className="text-sm text-gray-500 dark:text-gray-400">Voices cloned via ElevenLabs will appear in your ElevenLabs dashboard and can be used in the Voice Over tab once added. Select them from the Voice dropdown in the Voice Over tab.</p>
                  <a
@@ -648,7 +648,7 @@ export default function Production() {
 
           {activeTab === 'images' && (
             <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-2">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+              <div className="bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                 <h3 className="font-bold mb-4 text-gray-900 dark:text-white">🎨 AI Image Generator</h3>
                 <textarea 
                   value={imagePrompt}
@@ -686,7 +686,7 @@ export default function Production() {
                 </button>
               </div>
               
-              <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+              <div className="lg:col-span-2 bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-bold text-gray-900 dark:text-white">🖼️ Generated Images</h3>
                   <span className="text-sm text-gray-500 dark:text-gray-400">Free tier: 50 images/month</span>
@@ -708,7 +708,7 @@ export default function Production() {
           {activeTab === 'editor' && (
             <div className="grid lg:grid-cols-1 gap-6 animate-in fade-in slide-in-from-bottom-2">
                {/* Preview Player */}
-               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+               <div className="bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-gray-900 dark:text-white">📺 Preview & Timeline</h3>
                     <div className="flex gap-2">
@@ -836,7 +836,7 @@ export default function Production() {
 
           {activeTab === 'video' && (
             <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-2">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                     <h3 className="font-bold mb-4 text-gray-900 dark:text-white">🎬 Video Generator</h3>
                     
                     <div className="mb-4">
@@ -877,7 +877,7 @@ export default function Production() {
                     </button>
                 </div>
                 
-                <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="lg:col-span-2 bg-[#111] rounded-2xl p-6 border border-white/5 shadow-xl">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-900 dark:text-white">🎥 Generated Videos</h3>
                         <div className="flex gap-2">
