@@ -29,6 +29,8 @@ export interface ProductionSessionData {
   activeTab: string;
   originalVoiceText: string;
   updatedAt: number;
+  imageStyle?: string;
+  imageSize?: string;
 }
 
 const DEFAULT_STATE: ProductionSessionData = {

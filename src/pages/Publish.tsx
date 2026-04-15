@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
+import { Footer } from '@/components/Footer';
 import { publishService, Post } from '@/services/publishService';
 import { showToast } from '@/utils/toast';
 
@@ -152,8 +153,12 @@ export default function Publish() {
     ));
   };
 
+Preview-14058922509981430571
   const handleSchedulePost = (dayOrEvent?: number | React.MouseEvent) => {
     const day = typeof dayOrEvent === "number" ? dayOrEvent : undefined;
+    
+  const handleSchedulePost = (e?: React.MouseEvent<HTMLElement>, day?: number) => {
+dev
     const dateStr = day
       ? `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
       : new Date().toISOString().split('T')[0];
@@ -437,7 +442,11 @@ export default function Publish() {
                           <div 
                             key={i} 
                             className={`min-h-[140px] bg-white dark:bg-gray-800 p-2 relative group transition hover:bg-gray-50 dark:hover:bg-gray-700/50 ${!day ? 'bg-gray-50 dark:bg-gray-800/50' : ''}`}
+Preview-14058922509981430571
                             onClick={(e) => day && handleSchedulePost(day as number)}
+
+                            onClick={(e) => day && handleSchedulePost(e, day as number)}
+dev
                           >
                             {day && (
                               <>
@@ -598,6 +607,7 @@ export default function Publish() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
