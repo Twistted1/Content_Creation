@@ -12,6 +12,8 @@ export interface TimelineItem {
 }
 
 export interface ProductionSessionData {
+  imageStyle?: string;
+  imageSize?: string;
   voiceText: string;
   imagePrompt: string;
   videoPrompt: string;
@@ -27,6 +29,8 @@ export interface ProductionSessionData {
   activeTab: string;
   originalVoiceText: string;
   updatedAt: number;
+  imageStyle?: string;
+  imageSize?: string;
 }
 
 const DEFAULT_STATE: ProductionSessionData = {
