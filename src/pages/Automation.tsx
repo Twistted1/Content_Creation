@@ -224,155 +224,364 @@ export default function Automation() {
       <TopNav />
       
       <main className="max-w-[1600px] mx-auto px-4 pt-24 fade-in">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">⚡ Workflow Automation</h1>
-          <p className="text-gray-600 dark:text-gray-400">Create automated pipelines for your content creation</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                <i className="fas fa-bolt text-purple-400"></i>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                Automation Engine
+                <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30">
+                  2 Active
+                </span>
+              </h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Build intelligent workflows that run your content empire on autopilot</p>
+          </div>
+          <button className="gradient-bg px-6 py-2.5 rounded-lg font-medium text-white hover:opacity-90 transition shadow-lg flex items-center gap-2">
+            <i className="fas fa-plus"></i> New Workflow
+          </button>
         </div>
 
-        {/* Active Workflows */}
+        {/* Top Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white dark:bg-[#11131f] rounded-xl p-5 border border-gray-200 dark:border-green-500/20 relative overflow-hidden group shadow-sm dark:shadow-none">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Workflows</span>
+              <i className="fas fa-wave-square text-green-500 dark:text-green-400"></i>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">2</div>
+          </div>
+          <div className="bg-white dark:bg-[#11131f] rounded-xl p-5 border border-gray-200 dark:border-purple-500/20 relative overflow-hidden group shadow-sm dark:shadow-none">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Executions</span>
+              <i className="fas fa-rocket text-purple-500 dark:text-purple-400"></i>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">70</div>
+          </div>
+          <div className="bg-white dark:bg-[#11131f] rounded-xl p-5 border border-gray-200 dark:border-yellow-500/20 relative overflow-hidden group shadow-sm dark:shadow-none">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Success Rate</span>
+              <i className="fas fa-bullseye text-yellow-500 dark:text-yellow-400"></i>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">95%</div>
+          </div>
+          <div className="bg-white dark:bg-[#11131f] rounded-xl p-5 border border-gray-200 dark:border-cyan-500/20 relative overflow-hidden group shadow-sm dark:shadow-none">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Time Saved</span>
+              <i className="fas fa-stopwatch text-cyan-500 dark:text-cyan-400"></i>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">37h 25m</div>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex gap-8 border-b border-gray-200 dark:border-gray-800 mb-8 overflow-x-auto no-scrollbar">
+          <button className="text-gray-900 dark:text-white pb-3 border-b-2 border-purple-500 font-medium flex items-center gap-2 whitespace-nowrap">
+            <i className="fas fa-layer-group"></i> My Workflows
+          </button>
+          <button className="text-gray-500 dark:text-gray-400 pb-3 font-medium hover:text-gray-900 dark:hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+            <i className="fas fa-wrench"></i> Workflow Builder
+          </button>
+          <button className="text-gray-500 dark:text-gray-400 pb-3 font-medium hover:text-gray-900 dark:hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+            <i className="fas fa-clock-rotate-left"></i> Execution History
+          </button>
+          <button className="text-gray-500 dark:text-gray-400 pb-3 font-medium hover:text-gray-900 dark:hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+            <i className="fas fa-book-open"></i> Templates
+          </button>
+        </div>
+
+        {/* Main Layout Grid */}
         <div className="grid lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-lg">🚀 Active Workflows</h3>
-                <button 
-                  onClick={() => {
-                    const builder = document.getElementById('workflow-builder');
-                    builder?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="gradient-bg px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition flex items-center gap-2"
-                >
-                  <i className="fas fa-plus"></i> New Workflow
+          <div className="lg:col-span-2 flex flex-col gap-4">
+              
+              {/* Workflow Card 1 */}
+              <div className="bg-white dark:bg-[#11131f] border border-gray-200 dark:border-gray-800 rounded-xl p-6 hover:border-purple-500/30 transition-all duration-300 shadow-sm dark:shadow-none relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-1 h-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-[#1a1c28] flex items-center justify-center text-2xl border border-gray-200 dark:border-gray-800">
+                      📝
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h4 className="font-bold text-lg text-gray-900 dark:text-white">Daily Tech News Digest</h4>
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                          Active
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Scrapes top tech blogs, writes summaries, and schedules tweets</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 bg-gray-50 dark:bg-[#1a1c28] rounded-lg p-1 border border-gray-200 dark:border-gray-800">
+                    <button className="p-2 text-gray-400 hover:text-green-500 transition rounded-md hover:bg-white dark:hover:bg-gray-800" title="Run Now">
+                      <i className="fas fa-play"></i>
+                    </button>
+                    <button className="p-2 text-gray-400 hover:text-yellow-500 transition rounded-md hover:bg-white dark:hover:bg-gray-800" title="Pause">
+                      <i className="fas fa-pause"></i>
+                    </button>
+                    <button className="p-2 text-gray-400 hover:text-purple-500 transition rounded-md hover:bg-white dark:hover:bg-gray-800" title="Duplicate">
+                      <i className="fas fa-copy"></i>
+                    </button>
+                    <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                    <button className="p-2 text-gray-400 hover:text-red-500 transition rounded-md hover:bg-white dark:hover:bg-gray-800" title="Delete">
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Pipeline Visualizer */}
+                <div className="bg-gray-50 dark:bg-[#0a0b10] rounded-xl p-5 border border-gray-200 dark:border-gray-800/50 mb-4 overflow-x-auto">
+                  <div className="flex items-center min-w-max">
+                    {/* Node 1 */}
+                    <div className="flex flex-col items-center relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center border-2 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] mb-2 relative">
+                        <i className="fas fa-rss text-sm"></i>
+                      </div>
+                      <span className="text-xs font-medium text-gray-900 dark:text-gray-300">RSS Fetch</span>
+                    </div>
+                    {/* Connector */}
+                    <div className="w-16 h-0.5 bg-green-500 relative -top-3 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+
+                    {/* Node 2 */}
+                    <div className="flex flex-col items-center relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center border-2 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)] mb-2 relative">
+                        <i className="fas fa-brain text-sm"></i>
+                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full border-2 border-[#0a0b10] animate-ping"></span>
+                      </div>
+                      <span className="text-xs font-medium text-gray-900 dark:text-gray-300">AI Writer</span>
+                    </div>
+                    {/* Connector */}
+                    <div className="w-16 h-0.5 bg-gray-200 dark:bg-gray-700 relative -top-3">
+                      <div className="h-full bg-purple-500 w-1/2 animate-pulse"></div>
+                    </div>
+
+                    {/* Node 3 */}
+                    <div className="flex flex-col items-center relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 mb-2">
+                        <i className="fas fa-image text-sm"></i>
+                      </div>
+                      <span className="text-xs font-medium text-gray-500">Image Gen</span>
+                    </div>
+                    {/* Connector */}
+                    <div className="w-16 h-0.5 bg-gray-200 dark:bg-gray-700 relative -top-3"></div>
+
+                    {/* Node 4 */}
+                    <div className="flex flex-col items-center relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 mb-2">
+                        <i className="fab fa-twitter text-sm"></i>
+                      </div>
+                      <span className="text-xs font-medium text-gray-500">Post</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1.5"><i className="fas fa-clock text-gray-400"></i> Every 24h</span>
+                    <span className="flex items-center gap-1.5"><i className="fas fa-bolt text-yellow-500"></i> 45 runs</span>
+                  </div>
+                  <span className="flex items-center gap-1.5">Next run: <span className="text-gray-900 dark:text-gray-300 font-medium">in 2 hours</span></span>
+                </div>
+              </div>
+
+              {/* Workflow Card 2 */}
+              <div className="bg-white dark:bg-[#11131f] border border-gray-200 dark:border-gray-800 rounded-xl p-6 hover:border-purple-500/30 transition-all duration-300 shadow-sm dark:shadow-none relative overflow-hidden group opacity-75 hover:opacity-100">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-[#1a1c28] flex items-center justify-center text-2xl border border-gray-200 dark:border-gray-800">
+                      🎥
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h4 className="font-bold text-lg text-gray-900 dark:text-white">YouTube to Shorts</h4>
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 border border-yellow-500/20">
+                          Paused
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Downloads new videos, clips highlights, and posts to TikTok</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 bg-gray-50 dark:bg-[#1a1c28] rounded-lg p-1 border border-gray-200 dark:border-gray-800">
+                    <button className="p-2 text-gray-400 hover:text-green-500 transition rounded-md hover:bg-white dark:hover:bg-gray-800" title="Resume">
+                      <i className="fas fa-play"></i>
+                    </button>
+                    <button className="p-2 text-gray-400 hover:text-purple-500 transition rounded-md hover:bg-white dark:hover:bg-gray-800" title="Duplicate">
+                      <i className="fas fa-copy"></i>
+                    </button>
+                    <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                    <button className="p-2 text-gray-400 hover:text-red-500 transition rounded-md hover:bg-white dark:hover:bg-gray-800" title="Delete">
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Pipeline Visualizer */}
+                <div className="bg-gray-50 dark:bg-[#0a0b10] rounded-xl p-5 border border-gray-200 dark:border-gray-800/50 mb-4 overflow-x-auto grayscale">
+                  <div className="flex items-center min-w-max">
+                    {/* Node 1 */}
+                    <div className="flex flex-col items-center relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 mb-2">
+                        <i className="fab fa-youtube text-sm"></i>
+                      </div>
+                      <span className="text-xs font-medium text-gray-500">Trigger</span>
+                    </div>
+                    {/* Connector */}
+                    <div className="w-16 h-0.5 bg-gray-200 dark:bg-gray-700 relative -top-3"></div>
+
+                    {/* Node 2 */}
+                    <div className="flex flex-col items-center relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 mb-2">
+                        <i className="fas fa-video text-sm"></i>
+                      </div>
+                      <span className="text-xs font-medium text-gray-500">Clipper</span>
+                    </div>
+                    {/* Connector */}
+                    <div className="w-16 h-0.5 bg-gray-200 dark:bg-gray-700 relative -top-3"></div>
+
+                    {/* Node 3 */}
+                    <div className="flex flex-col items-center relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 mb-2">
+                        <i className="fab fa-tiktok text-sm"></i>
+                      </div>
+                      <span className="text-xs font-medium text-gray-500">Post</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1.5"><i className="fas fa-bolt text-gray-400"></i> Webhook</span>
+                    <span className="flex items-center gap-1.5"><i className="fas fa-check-circle text-gray-400"></i> 12 runs</span>
+                  </div>
+                  <span className="flex items-center gap-1.5 text-yellow-600 dark:text-yellow-500">Paused by user</span>
+                </div>
+              </div>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+
+            {/* Quick Actions */}
+            <div className="bg-white dark:bg-[#11131f] rounded-xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <i className="fas fa-bolt text-yellow-500"></i> Quick Actions
+              </h3>
+              <div className="space-y-3">
+                <button className="w-full text-left px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1c28] border border-gray-200 dark:border-gray-800 hover:border-purple-500/50 transition group flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                      <i className="fas fa-rss text-orange-500"></i>
+                    </div>
+                    <span className="font-medium text-gray-900 dark:text-gray-300">New RSS Trigger</span>
+                  </div>
+                  <i className="fas fa-plus text-gray-400 group-hover:text-purple-500 transition"></i>
+                </button>
+                <button className="w-full text-left px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1c28] border border-gray-200 dark:border-gray-800 hover:border-purple-500/50 transition group flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <i className="fas fa-webhook text-blue-500"></i>
+                    </div>
+                    <span className="font-medium text-gray-900 dark:text-gray-300">Setup Webhook</span>
+                  </div>
+                  <i className="fas fa-plus text-gray-400 group-hover:text-purple-500 transition"></i>
+                </button>
+                <button className="w-full text-left px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1c28] border border-gray-200 dark:border-gray-800 hover:border-purple-500/50 transition group flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+                      <i className="fas fa-file-import text-green-500"></i>
+                    </div>
+                    <span className="font-medium text-gray-900 dark:text-gray-300">Import Template</span>
+                  </div>
+                  <i className="fas fa-arrow-right text-gray-400 group-hover:text-purple-500 transition"></i>
                 </button>
               </div>
-              
-              <div className="space-y-4">
-                {workflows.map(workflow => (
-                  <div key={workflow.id} className={`p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition ${!workflow.isActive ? 'opacity-75' : ''}`}>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 ${workflow.isActive ? 'bg-green-100 dark:bg-green-500/20' : 'bg-gray-200 dark:bg-gray-600/20'} rounded-lg flex items-center justify-center`}>
-                          <i className={`fas fa-${workflow.isActive ? 'check' : 'pause'} ${workflow.isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}></i>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">{workflow.name}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{workflow.schedule}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => workflow.id && runWorkflow(workflow.id)}
-                          className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/30 transition"
-                          disabled={!workflow.isActive}
-                        >
-                          <i className="fas fa-play mr-1"></i> Run
-                        </button>
-                        <button 
-                          onClick={() => workflow.id && deleteWorkflow(workflow.id)}
-                          className={`text-xs px-2 py-1 rounded transition ${confirmDeleteId === workflow.id ? 'bg-red-500 text-white' : 'text-gray-400 hover:text-red-400'}`}
-                          title={confirmDeleteId === workflow.id ? 'Click again to confirm' : 'Delete workflow'}
-                        >
-                          {confirmDeleteId === workflow.id ? 'Confirm?' : <i className="fas fa-trash"></i>}
-                        </button>
-                        <div className="flex items-center gap-2 ml-2">
-                          <span className={`text-xs ${workflow.isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                            {workflow.isActive ? 'Active' : 'Paused'}
-                          </span>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input 
-                              type="checkbox" 
-                              className="sr-only peer" 
-                              checked={workflow.isActive}
-                              onChange={() => workflow.id && toggleWorkflow(workflow.id, workflow.isActive)} 
-                            />
-                            <div className="w-9 h-5 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
-                      {workflow.steps.map((step, idx) => (
-                        <React.Fragment key={idx}>
-                          <span className={`px-2 py-1 bg-${step.color}-100 dark:bg-${step.color}-500/20 text-${step.color}-600 dark:text-${step.color}-400 rounded`}>
-                            {step.name}
-                          </span>
-                          {idx < workflow.steps.length - 1 && (
-                            <i className="fas fa-arrow-right text-gray-400 dark:text-gray-600"></i>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+            </div>
 
-                {workflows.length === 0 && !isLoading && (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                    <p>No active workflows. Create one below!</p>
+            {/* Active Triggers */}
+            <div className="bg-white dark:bg-[#11131f] rounded-xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <i className="fas fa-clock text-blue-500"></i> Upcoming Triggers
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 mt-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]"></div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-300">Daily Tech Digest</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Scheduled in 2 hours</p>
                   </div>
-                )}
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 mt-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]"></div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-300">Newsletter Sync</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Waiting for webhook event</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Automation Stats */}
-          <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
-              <h3 className="font-bold mb-4 text-gray-900 dark:text-white">📊 Automation Stats</h3>
+            {/* AI Recommendations */}
+            <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-xl p-6 border border-purple-500/20">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <i className="fas fa-sparkles text-purple-500"></i> AI Insights
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Your "Daily Tech News" workflow has a 95% success rate. We recommend adding an auto-retweet node to increase engagement by 24%.
+              </p>
+              <button className="w-full py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm font-medium transition shadow-lg shadow-purple-500/25">
+                Apply Optimization
+              </button>
+            </div>
+
+            {/* Usage Stats */}
+            <div className="bg-white dark:bg-[#11131f] rounded-xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4">Resource Usage</h3>
+
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-500 dark:text-gray-400">Workflows Completed</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{stats.completed}</span>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-gray-600 dark:text-gray-400">AI Credits</span>
+                    <span className="font-medium text-gray-900 dark:text-white">8,450 / 10,000</span>
                   </div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                    <div className="h-2 bg-purple-500 rounded-full" style={{ width: '85%' }}></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-500 dark:text-gray-400">Time Saved</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{stats.timeSavedHours}h {stats.timeSavedMinutes}m</span>
-                  </div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                    <div className="h-2 bg-green-500 rounded-full" style={{ width: '72%' }}></div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full" style={{ width: '84.5%' }}></div>
                   </div>
                 </div>
+
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-500 dark:text-gray-400">Credits Used</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{stats.creditsUsed.toLocaleString()} / {stats.creditsTotal.toLocaleString()}</span>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-gray-600 dark:text-gray-400">Storage</span>
+                    <span className="font-medium text-gray-900 dark:text-white">2.4 / 10 GB</span>
                   </div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                    <div className="h-2 bg-blue-500 rounded-full" style={{ width: `${(stats.creditsUsed / stats.creditsTotal) * 100}%` }}></div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-green-500 to-cyan-500 h-2 rounded-full" style={{ width: '24%' }}></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-gray-600 dark:text-gray-400">API Calls</span>
+                    <span className="font-medium text-gray-900 dark:text-white">12k / 50k</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-yellow-500 to-orange-500 h-2 rounded-full" style={{ width: '24%' }}></div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
-              <h3 className="font-bold mb-4 text-gray-900 dark:text-white">⏰ Triggers</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-transparent">
-                  <i className="fas fa-clock text-purple-500 dark:text-purple-400"></i>
-                  <span className="text-sm text-gray-700 dark:text-gray-200">Schedule-based</span>
-                  <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">Active</span>
-                </div>
-                <div className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-transparent">
-                  <i className="fas fa-bolt text-yellow-500 dark:text-yellow-400"></i>
-                  <span className="text-sm text-gray-700 dark:text-gray-200">Webhook</span>
-                  <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">Active</span>
-                </div>
-                <div className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-transparent">
-                  <i className="fas fa-file text-blue-500 dark:text-blue-400"></i>
-                  <span className="text-sm text-gray-700 dark:text-gray-200">File upload</span>
-                  <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">Active</span>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
 
-        {/* Workflow Builder */}
-        <div id="workflow-builder" className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+        {/* Workflow Builder Section (Hidden for now, anchor point) */}
+        <div id="workflow-builder" className="bg-white dark:bg-[#11131f] rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-gray-900 dark:text-white">🔧 Workflow Builder</h3>
             <div className="flex items-center gap-2">
