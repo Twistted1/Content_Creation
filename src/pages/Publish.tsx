@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
 import { publishService, Post } from '@/services/publishService';
 import { showToast } from '@/utils/toast';
+import { cn } from '@/utils/cn';
 
 interface AutoRule {
   id: string;
@@ -34,7 +35,6 @@ export default function Publish() {
     type: 'video',
   });
   const [isConnecting, setIsConnecting] = useState(false);
-  const [channelInfo, setChannelInfo] = useState<any>(null);
 
   // Initialize Google Identity Services
     useEffect(() => {
@@ -70,9 +70,11 @@ export default function Publish() {
     setIsConnecting(true);
 
     // Initialize the token client
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client = (window as any).google?.accounts.oauth2.initTokenClient({
       client_id: youtubeClientId,
       scope: 'https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback: (response: any) => {
         if (response.access_token) {
           sessionStorage.setItem('youtube_access_token', response.access_token);
@@ -118,6 +120,13 @@ export default function Publish() {
     { id: '7', platform: 'website', name: 'Novus Exchange (Website)', enabled: true, trigger: 'When post is ready' },
     { id: '8', platform: 'rumble', name: 'Rumble Auto-Upload', enabled: true, trigger: 'When video is ready' }
   ]);
+
+  const stats = [
+    { label: 'Scheduled', count: 12, icon: 'fas fa-calendar-alt', color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+    { label: 'Published', count: 48, icon: 'fas fa-check-circle', color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' },
+    { label: 'Drafts', count: 5, icon: 'fas fa-file-alt', color: 'text-yellow-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
+    { label: 'Total Views', count: '1.2M', icon: 'fas fa-eye', color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30' }
+  ];
 
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -229,7 +238,7 @@ export default function Publish() {
                {isYoutubeConnected ? 'Connected' : 'Connect YouTube'}
              </button>
              <button 
-               onClick={handleSchedulePost}
+               onClick={() => handleSchedulePost()}
                className="gradient-bg px-6 py-2 rounded-lg font-medium hover:opacity-90 transition flex items-center gap-2 text-white shadow-lg shadow-purple-900/20"
              >
                <i className="fas fa-calendar-plus"></i> Schedule Post
@@ -378,6 +387,21 @@ export default function Publish() {
              </div>
           </div>
         )}
+
+        {/* Top Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {stats.map((stat, idx) => (
+            <div key={idx} className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{stat.label}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.count}</p>
+              </div>
+              <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", stat.bg)}>
+                <i className={cn(stat.icon, "text-xl", stat.color)}></i>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* View Toggle */}
         <div className="flex gap-4 mb-6">
@@ -590,7 +614,7 @@ export default function Publish() {
                 )}
               </div>
               
-              <button onClick={handleSchedulePost} className="w-full mt-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-purple-500 hover:text-purple-500 transition text-sm font-medium">
+              <button onClick={() => handleSchedulePost()} className="w-full mt-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-purple-500 hover:text-purple-500 transition text-sm font-medium">
                   + Add New
               </button>
             </div>
