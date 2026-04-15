@@ -122,6 +122,8 @@ export function TopNav() {
   const secondaryNavItems = [
     { name: 'Monetization', path: '/monetization' },
     { name: 'Pricing', path: '/pricing' },
+    { name: 'Usage Analytics', path: '/usage' },
+    { name: 'API Docs', path: '/api' },
     { name: 'Affiliate', path: '/affiliate' },
     { name: 'White-label', path: '/admin' },
     { name: 'System Status', path: '/admin/status' },

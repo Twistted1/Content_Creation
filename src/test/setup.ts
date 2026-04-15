@@ -1,6 +1,17 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// 1. Mock internal auth service (From your branch)
+vi.mock('@/services/authService', () => ({
+  authService: {
+    onAuthStateChanged: vi.fn((cb) => {
+      return () => {};
+    }),
+    getCurrentUser: vi.fn(() => null)
+  }
+}));
+
+// 2. Comprehensive Firebase Mocks (From dev)
 vi.mock('firebase/firestore', () => ({
   getFirestore: vi.fn(() => ({})),
   initializeFirestore: vi.fn(() => ({})),
