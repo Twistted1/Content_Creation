@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
+import { Footer } from '@/components/Footer';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { aiService } from '../services/aiService';
 import { publishService } from '../services/publishService';
@@ -820,6 +821,7 @@ export default function Production() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

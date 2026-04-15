@@ -12,6 +12,8 @@ export interface TimelineItem {
 }
 
 export interface ProductionSessionData {
+  imageStyle?: string;
+  imageSize?: string;
   voiceText: string;
   imagePrompt: string;
   videoPrompt: string;
