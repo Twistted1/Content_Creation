@@ -91,13 +91,13 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border border-white/5 p-4 rounded-xl">
+        <div className="bg-gray-800/80 p-4 rounded-xl border border-gray-700/50 shadow-inner">
           <div className="flex items-center gap-2 mb-2">
             <i className="fas fa-gift text-purple-400"></i>
             <span className="text-sm font-bold text-white">Limited Offer</span>
           </div>
           <p className="text-xs text-gray-400 mb-2">Get 50% off your first month with code:</p>
-          <div className="bg-black/30 p-2 rounded text-center font-mono text-xs text-purple-300 border border-purple-500/20">
+          <div className="bg-gray-900/50 p-2 rounded text-center font-mono text-xs text-purple-300 border border-purple-500/20">
             WELCOME50
           </div>
         </div>

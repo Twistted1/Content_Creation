@@ -152,7 +152,7 @@ export default function Publish() {
     ));
   };
 
-  const handleSchedulePost = (day?: number) => {
+  const handleSchedulePost = (e?: React.MouseEvent<HTMLElement>, day?: number) => {
     const dateStr = day
       ? `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
       : new Date().toISOString().split('T')[0];
@@ -436,7 +436,7 @@ export default function Publish() {
                           <div 
                             key={i} 
                             className={`min-h-[140px] bg-white dark:bg-gray-800 p-2 relative group transition hover:bg-gray-50 dark:hover:bg-gray-700/50 ${!day ? 'bg-gray-50 dark:bg-gray-800/50' : ''}`}
-                            onClick={() => day && handleSchedulePost(day as number)}
+                            onClick={(e) => day && handleSchedulePost(e, day as number)}
                           >
                             {day && (
                               <>
