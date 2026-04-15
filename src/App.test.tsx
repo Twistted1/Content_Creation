@@ -19,10 +19,14 @@ describe('App', () => {
 describe('App', () => {
   it('renders without crashing', () => {
     render(
+jules-idea-generation-ui-6103607865090958462
+      <App />
+
 feat/script-studio-ui-16096172312553521028
         <App />
 
       <App />
+dev
 dev
     );
 dev
