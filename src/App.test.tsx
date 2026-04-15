@@ -1,16 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import App from './App';
-import { BrowserRouter } from 'react-router-dom';
 
 describe('App', () => {
   it('renders without crashing', () => {
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
-    // Since we don't know exactly what's on the home page, just check if the body exists
+    // App component itself includes a <Router>, so we shouldn't wrap it in another <BrowserRouter>
+    render(<App />);
     expect(document.body).toBeTruthy();
   });
 });

@@ -26,6 +26,8 @@ export interface ProductionSessionData {
   speechPitch: number;
   activeTab: string;
   originalVoiceText: string;
+  imageStyle?: string;
+  imageSize?: string;
   updatedAt: number;
 }
 

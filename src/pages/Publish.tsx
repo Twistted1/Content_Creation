@@ -152,7 +152,8 @@ export default function Publish() {
     ));
   };
 
-  const handleSchedulePost = (day?: number) => {
+  const handleSchedulePost = (dayOrEvent?: number | React.MouseEvent) => {
+    const day = typeof dayOrEvent === 'number' ? dayOrEvent : undefined;
     const dateStr = day
       ? `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
       : new Date().toISOString().split('T')[0];
