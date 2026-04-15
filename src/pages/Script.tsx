@@ -1,6 +1,7 @@
 import React from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
 import ScriptStudio from '@/components/script/ScriptStudio';
+import { Footer } from '@/components/Footer';
 
 export default function Script() {
   return (
@@ -9,6 +10,7 @@ export default function Script() {
       <div className="flex-1 pt-16">
         <ScriptStudio />
       </div>
+      <Footer />
     </div>
   );
 }

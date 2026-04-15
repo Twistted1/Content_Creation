@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
+import { Footer } from '@/components/Footer';
 import { publishService, Post } from '@/services/publishService';
 import { showToast } from '@/utils/toast';
 
@@ -597,6 +598,7 @@ export default function Publish() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
