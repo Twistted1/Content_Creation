@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Footer } from '@/components/Footer';
 
 export default function Landing() {
   return (
@@ -130,18 +131,20 @@ export default function Landing() {
           <p className="mt-6 text-sm text-gray-400">No credit card required • Cancel anytime</p>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
 
 function FeatureCard({ icon, color, bg, title, desc }: any) {
   return (
-    <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-gray-600 transition group">
-      <div className={`w-14 h-14 ${bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300`}>
+    <div className="bg-gray-800/80 p-8 rounded-2xl border border-gray-700/50 hover:border-purple-500/50 hover:bg-gray-800 transition-all duration-300 group hover:shadow-2xl hover:shadow-purple-500/10">
+      <div className={`w-14 h-14 ${bg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-inner`}>
         <i className={`fas fa-${icon} text-2xl ${color}`}></i>
       </div>
-      <h3 className="text-xl font-bold mb-3">{title}</h3>
-      <p className="text-gray-400 leading-relaxed">{desc}</p>
+      <h3 className="text-xl font-bold mb-3 group-hover:text-purple-300 transition-colors">{title}</h3>
+      <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">{desc}</p>
     </div>
   );
 }

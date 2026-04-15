@@ -1,6 +1,15 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+vi.mock('@/services/authService', () => ({
+  authService: {
+    onAuthStateChanged: vi.fn((cb) => {
+      return () => {};
+    }),
+    getCurrentUser: vi.fn(() => null)
+  }
+}));
+
 vi.mock('firebase/app', () => ({
   initializeApp: vi.fn(),
   getApps: vi.fn(() => []),
