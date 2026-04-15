@@ -229,7 +229,7 @@ export default function Publish() {
                {isYoutubeConnected ? 'Connected' : 'Connect YouTube'}
              </button>
              <button 
-               onClick={handleSchedulePost}
+               onClick={() => handleSchedulePost()}
                className="gradient-bg px-6 py-2 rounded-lg font-medium hover:opacity-90 transition flex items-center gap-2 text-white shadow-lg shadow-purple-900/20"
              >
                <i className="fas fa-calendar-plus"></i> Schedule Post
@@ -590,7 +590,7 @@ export default function Publish() {
                 )}
               </div>
               
-              <button onClick={handleSchedulePost} className="w-full mt-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-purple-500 hover:text-purple-500 transition text-sm font-medium">
+              <button onClick={() => handleSchedulePost()} className="w-full mt-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:border-purple-500 hover:text-purple-500 transition text-sm font-medium">
                   + Add New
               </button>
             </div>
