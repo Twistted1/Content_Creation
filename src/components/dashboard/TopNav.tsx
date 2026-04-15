@@ -122,8 +122,6 @@ export function TopNav() {
   const secondaryNavItems = [
     { name: 'Monetization', path: '/monetization' },
     { name: 'Pricing', path: '/pricing' },
-    { name: 'Usage Analytics', path: '/usage' },
-    { name: 'API Docs', path: '/api' },
     { name: 'Affiliate', path: '/affiliate' },
     { name: 'White-label', path: '/admin' },
     { name: 'System Status', path: '/admin/status' },
@@ -197,9 +195,9 @@ export function TopNav() {
 
             <Link 
               to="/pricing" 
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded-md font-bold text-sm hover:bg-amber-200 transition-colors border-none"
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-full text-xs font-bold text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 dark:hover:text-white hover:border-yellow-400 transition-all"
             >
-              <span className="text-lg">👑</span> Upgrade
+              <i className="fas fa-crown"></i> Upgrade
             </Link>
 
             {deferredPrompt ? (

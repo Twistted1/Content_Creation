@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
-import { Footer } from '@/components/Footer';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 // Toast helper
 const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -169,7 +167,7 @@ export default function Usage() {
                   <select 
                     value={metric}
                     onChange={(e) => setMetric(e.target.value)}
-                    className="bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none cursor-pointer"
+                    className="bg-gray-700 rounded-lg px-3 py-2"
                   >
                     <option value="llm">LLM tokens</option>
                     <option value="slm">SLM tokens</option>
@@ -180,21 +178,22 @@ export default function Usage() {
                   <button onClick={() => setUsageEvents([...usageEvents])} className="bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600 transition">Refresh</button>
                 </div>
               </div>
-              <div className="mt-4 h-72 w-full text-xs">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={days.map((day, i) => ({ name: day, value: arr[i] }))} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
-                    <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} tickLine={false} axisLine={false} tickFormatter={(val) => metric === 'llm' || metric === 'slm' || metric === 'tts' ? Math.round(val/1000)+'K' : val} />
-                    <Tooltip
-                      cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
-                      contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', borderRadius: '0.5rem', color: '#fff' }}
-                      itemStyle={{ color: '#a855f7' }}
-                      formatter={(val: number) => [metric === 'llm' || metric === 'slm' || metric === 'tts' ? Math.round(val/1000)+'K' : val, 'Units']}
-                    />
-                    <Bar dataKey="value" fill="#a855f7" radius={[4, 4, 0, 0]} barSize={40} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="mt-4 h-64 flex items-end justify-around gap-2 px-2 pb-2">
+                {arr.map((val, i) => (
+                  <div key={i} className="w-full flex flex-col items-center gap-2 group">
+                    <div
+                      className="w-full bg-gradient-to-t from-purple-500 to-blue-500 rounded-t-sm hover:opacity-90 transition-all relative"
+                      style={{ height: `${Math.max(4, (val / max) * 100)}%` }}
+                    >
+                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-gray-700 z-10">
+                          {metric === 'llm' || metric === 'slm' || metric === 'tts' ? Math.round(val/1000)+'K' : val}
+                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-around mt-4 text-sm text-gray-400">
+                {days.map(d => <span key={d}>{d}</span>)}
               </div>
             </div>
 
@@ -341,7 +340,6 @@ export default function Usage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
