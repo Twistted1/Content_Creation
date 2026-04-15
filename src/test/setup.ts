@@ -11,8 +11,17 @@ vi.mock('firebase/auth', () => {
   GoogleAuthProviderMock.prototype.addScope = vi.fn();
 
   return {
-    getAuth: vi.fn(() => ({})),
-    onAuthStateChanged: vi.fn(() => () => {}),
+    getAuth: vi.fn(() => ({
+      currentUser: null,
+    })),
+    onAuthStateChanged: vi.fn((auth, cb) => {
+      if (typeof auth === 'function') {
+        auth(null);
+      } else if (cb) {
+        cb(null);
+      }
+      return () => {};
+    }),
     GoogleAuthProvider: GoogleAuthProviderMock,
     signInWithPopup: vi.fn(),
     signOut: vi.fn(),
@@ -26,12 +35,15 @@ vi.mock('firebase/firestore', () => ({
   initializeFirestore: vi.fn(() => ({})),
   persistentLocalCache: vi.fn(),
   persistentMultipleTabManager: vi.fn(),
+  doc: vi.fn(),
   collection: vi.fn(),
+  setDoc: vi.fn(),
+  getDoc: vi.fn(),
+  onSnapshot: vi.fn(),
   addDoc: vi.fn(),
   getDocs: vi.fn(),
   updateDoc: vi.fn(),
   deleteDoc: vi.fn(),
-  doc: vi.fn(),
   query: vi.fn(),
   orderBy: vi.fn(),
   Timestamp: { now: vi.fn() },
