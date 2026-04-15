@@ -12,6 +12,8 @@ export interface TimelineItem {
 }
 
 export interface ProductionSessionData {
+  imageStyle?: string;
+  imageSize?: string;
   voiceText: string;
   imagePrompt: string;
   videoPrompt: string;
@@ -53,7 +55,9 @@ const DEFAULT_STATE: ProductionSessionData = {
   speechPitch: 1.0,
   activeTab: 'voiceover',
   originalVoiceText: '',
-  updatedAt: Date.now()
+  updatedAt: Date.now(),
+  imageStyle: 'photorealistic',
+  imageSize: '1024x1024'
 };
 
 export const useProductionSession = () => {

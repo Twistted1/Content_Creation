@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { TopNav } from '@/components/dashboard/TopNav';
+import { Footer } from '@/components/Footer';
+import Prism from 'prismjs';
+import 'prismjs/themes/prism-tomorrow.css';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-json';
 
 // Toast helper
 const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -91,6 +96,10 @@ Authorization: Bearer ${key}`
     };
     return samples[section] || samples.auth;
   };
+
+  useEffect(() => {
+    Prism.highlightAll();
+  }, [activeSection, tryResponse]);
 
   const runApiTryIt = () => {
     const panel = activeSection;
@@ -336,16 +345,16 @@ Authorization: Bearer ${key}`
                 </button>
               </div>
               <div className="mt-4 grid md:grid-cols-2 gap-4">
-                <div>
+                <div className="h-40 flex flex-col">
                   <label className="text-sm text-gray-400 mb-1 block">Request</label>
-                  <pre className="font-mono text-xs bg-gray-900/40 border border-gray-700 rounded-xl p-4 overflow-auto h-40 text-gray-300 whitespace-pre-wrap">
-                    {getSampleRequest(activeSection)}
+                  <pre className="font-mono text-xs bg-gray-900/40 border border-gray-700 rounded-xl p-4 overflow-auto flex-1 text-gray-300">
+                    <code className="language-bash">{getSampleRequest(activeSection)}</code>
                   </pre>
                 </div>
-                <div>
+                <div className="h-40 flex flex-col">
                   <label className="text-sm text-gray-400 mb-1 block">Response</label>
-                  <pre className="font-mono text-xs bg-gray-900/40 border border-gray-700 rounded-xl p-4 overflow-auto h-40 text-green-400">
-                    {tryResponse ? JSON.stringify(tryResponse, null, 2) : '// Click Send Request to see response...'}
+                  <pre className="font-mono text-xs bg-gray-900/40 border border-gray-700 rounded-xl p-4 overflow-auto flex-1">
+                    <code className="language-json">{tryResponse ? JSON.stringify(tryResponse, null, 2) : '// Click Send Request to see response...'}</code>
                   </pre>
                 </div>
               </div>
@@ -354,6 +363,7 @@ Authorization: Bearer ${key}`
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
