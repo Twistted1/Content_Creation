@@ -29,6 +29,8 @@ export interface ProductionSessionData {
   imageStyle?: string;
   imageSize?: string;
   updatedAt: number;
+  imageStyle?: string;
+  imageSize?: string;
 }
 
 const DEFAULT_STATE: ProductionSessionData = {
